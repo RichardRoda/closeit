@@ -7,7 +7,7 @@ Java 7 introduced a useful feature known as the try-with-resources construct. In
   
     public void useContext(Context ctx) throws NamingException {
         try(CloseIt1<NamingException> it = ctx::close) {
-            // Do something
+            doSomethingWithContext(ctx);
         }
     }
 
@@ -16,6 +16,6 @@ Java 7 introduced a useful feature known as the try-with-resources construct. In
     public void useExecutorService() {
         ExecutorService es = Executors.newSingleThreadExecutor();
         try(CloseIt0 it = es::shutdown) {
-            // Do something
+            doSomethingWithExecutorService(es);
         }
     }

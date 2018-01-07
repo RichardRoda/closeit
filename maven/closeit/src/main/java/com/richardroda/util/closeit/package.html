@@ -23,7 +23,7 @@ it throws one checked exception, <code>CloseIt1</code> is used.  Up to five
 <pre><code>
     public void useContext(Context ctx) throws NamingException {
         try(CloseIt1&lt;NamingException&gt; it = ctx::close) {
-            // Do something
+            doSomethingWithContext(ctx);
         }
     }
 </code></pre>
@@ -33,7 +33,7 @@ it throws one checked exception, <code>CloseIt1</code> is used.  Up to five
     public void useExecutorService() {
         ExecutorService es = Executors.newSingleThreadExecutor();
         try(CloseIt0 it = es::shutdown) {
-            // Do something
+            doSomethingWithExecutorService(es);
         }
     }
 </code></pre>
