@@ -1,9 +1,9 @@
 package com.github.richardroda.util.closeit;
 
 /**
- * Interface to allow try-with-resources to be used with any lambda expression
- * that throws a single checked exception.
- * @author Richard
+ * Functional Interface to allow try-with-resources to be used with any lambda
+ * expression that throws a single checked exception.
+ * @author Richard Roda
  */
 @FunctionalInterface
 public interface CloseIt1<E extends Exception> extends AutoCloseable {

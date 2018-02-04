@@ -1,11 +1,5 @@
 package com.github.richardroda.util.closeit;
 
-import com.github.richardroda.util.closeit.CloseIt5;
-import com.github.richardroda.util.closeit.CloseIt3;
-import com.github.richardroda.util.closeit.CloseIt2;
-import com.github.richardroda.util.closeit.CloseIt0;
-import com.github.richardroda.util.closeit.CloseIt1;
-import com.github.richardroda.util.closeit.CloseIt4;
 import java.util.EnumSet;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;

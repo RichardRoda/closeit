@@ -1,9 +1,9 @@
 package com.github.richardroda.util.closeit;
 
 /**
- * Interface to allow a lambda that throws no checked exceptions to be
- * used with a try-with-resources construct.
- * @author Richard
+ * Functional Interface to allow a lambda that throws no checked exceptions to 
+ * be used with a try-with-resources construct.
+ * @author Richard Roda
  */
 @FunctionalInterface
 public interface CloseIt0 extends AutoCloseable {

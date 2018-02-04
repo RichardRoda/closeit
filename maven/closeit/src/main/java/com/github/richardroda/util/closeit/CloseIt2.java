@@ -1,9 +1,9 @@
 package com.github.richardroda.util.closeit;
 
 /**
- * Interface to allow try-with-resources to be used with any lambda expression
- * that throws a two checked exceptions.
- * @author Richard
+ * Functional Interface to allow try-with-resources to be used with any lambda
+ * expression that throws a two checked exceptions.
+ * @author Richard Roda
  */
 @FunctionalInterface
 public interface CloseIt2<E1 extends Exception, 
