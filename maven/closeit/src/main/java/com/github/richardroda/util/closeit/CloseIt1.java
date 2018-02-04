@@ -1,4 +1,4 @@
-package com.github.richardroda.util;
+package com.github.richardroda.util.closeit;
 
 /**
  * Interface to allow try-with-resources to be used with any lambda expression
