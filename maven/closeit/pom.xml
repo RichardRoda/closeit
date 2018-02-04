@@ -10,7 +10,26 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    <name>closeit</name>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <licenses>
+      <license>
+        <name>The Apache License, Version 2.0</name>
+        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+    </licenses>
+    <developers>
+        <developer>
+          <name>Richard Roda</name>
+          <email>richard_roda@hotmail.com</email>
+          <organization>Personal</organization>
+          <organizationUrl>https://github.com/RichardRoda</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+      <connection>scm:git:git://github.com/RichardRoda/closeit.git</connection>
+      <developerConnection>scm:git:ssh://github.com/RichardRoda/closeit.git</developerConnection>
+      <url>https://github.com/RichardRoda/closeit.git/tree/master</url>
+    </scm>
     <dependencies>
     <dependency>
         <groupId>org.testng</groupId>
