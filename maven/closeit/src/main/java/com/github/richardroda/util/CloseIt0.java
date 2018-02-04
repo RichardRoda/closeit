@@ -1,4 +1,4 @@
-package com.richardroda.util.closeit;
+package com.github.richardroda.util;
 
 /**
  * Interface to allow a lambda that throws no checked exceptions to be

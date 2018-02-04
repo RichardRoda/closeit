@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.richardroda.util</groupId>
+    <groupId>com.github.richardroda.util </groupId>
     <artifactId>closeit</artifactId>
     <version>1.1</version>
     <packaging>jar</packaging>
@@ -59,7 +59,7 @@
           <configuration>
             <archive>
             <!-- For integration using Java 9 automatic modules.  Give a stable
-                 module name of com.richardroda.util.closeit instead of the
+                 module name of com.github.richardroda.util .closeit instead of the
                  name of the jarfile. -->
               <manifestEntries>
                 <Automatic-Module-Name>${project.groupId}.${project.artifactId}</Automatic-Module-Name>

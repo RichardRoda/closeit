@@ -1,19 +1,21 @@
-package com.richardroda.util.closeit;
+package com.github.richardroda.util;
 
 /**
  * Interface to allow try-with-resources to be used with any lambda expression
- * that throws a two checked exceptions.
+ * that throws a four checked exceptions.  
  * @author Richard
  */
 @FunctionalInterface
-public interface CloseIt2<E1 extends Exception, 
-        E2 extends Exception> extends AutoCloseable {
+public interface CloseIt4<E1 extends Exception, 
+        E2 extends Exception, 
+        E3 extends Exception, 
+        E4 extends Exception> extends AutoCloseable {
     @Override
-    default void close() throws E1, E2 {
+    default void close() throws E1, E2, E3, E4 {
         closeIt();
     }
 
-    void closeIt() throws E1, E2;
+    void closeIt() throws E1, E2, E3, E4;
 }
 /*
 BSD 2-Clause License
