@@ -1,6 +1,18 @@
 # Closeit #
 Provides functional interfaces for using lambda expressions as the target of a `try-with-resources` construct.
 
+This project is available from Maven Central Repository.  To use it, add the following dependency:
+
+        <dependency>
+            <groupId>com.github.richardroda.util</groupId>
+            <artifactId>closeit</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+Use this dependency for Gradle
+
+	compile "com.github.richardroda.util:closeit:1.1"
+
 Java 7 introduced a useful feature known as the `try-with-resources` construct. In order to take advantage of it, a class must implement `AutoCloseable`. However, there are classes that could benefit from this interface that do not implement it. Two examples are `Context` and `ExecutorService`. Although `AutoCloseable` is a functional interface because it implements exactly 1 abstract method, it is often not what is needed as a lambda target because `AutoCloseable::close` throws `Exception`. 
 
 **Example 1: Close a Context With AutoCloseable**
@@ -15,6 +27,8 @@ The CloseIt interfaces provide a series of generic interfaces that are parameter
 
 **Example 2: Close a Context with CloseIt**
   
+	import com.github.richardroda.util.closeit.*;
+	...
     public void useContext(Context ctx) throws NamingException {
         try(CloseIt1<NamingException> it = ctx::close) {
             doSomethingWithContext(ctx);
@@ -23,6 +37,8 @@ The CloseIt interfaces provide a series of generic interfaces that are parameter
 
 **Example 3: Shutdown an ExecutorService with CloseIt**
   
+	import com.github.richardroda.util.closeit.*;
+	...
     public void useExecutorService() {
         ExecutorService es = Executors.newSingleThreadExecutor();
         try(CloseIt0 it = es::shutdown) {
@@ -96,6 +112,8 @@ Ugh.  This code hurts to read.  Assuming the `processException` method would be 
 
 **Example 6: Rewrite using CloseIt**
 
+	import com.github.richardroda.util.closeit.*;
+	...
     public void useContextAndExecutorService(Context ctx, ExecutorService es) throws NamingException, InterruptedException {
         try (CloseIt1<NamingException> thing1 = ctx::close;
              CloseIt1<InterruptedException> thing2 = ()-> {
