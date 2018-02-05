@@ -1,4 +1,4 @@
-# Closeit #
+# CloseIt #
 Provides functional interfaces for using lambda expressions as the target of a `try-with-resources` construct.
 
 This project is available from Maven Central Repository.  To use it, add the following dependency:
@@ -46,7 +46,7 @@ The CloseIt interfaces provide a series of generic interfaces that are parameter
         }
     }
 
-## Closeit as a finally replacement ##
+## CloseIt as a finally replacement ##
 
 The CloseIt interfaces with a lambda expression may be used instead of a `finally` block.  There are good reasons for doing so.  The `try-with-resources` feature was created because exceptions that occur when closing resources within a `finally` block can interfere with the processing of other resources, and exceptions within the `finally` block can conceal exceptions within the `try` block.  Concealing exceptions within the `try` block is particularly problematic because the exceptions in the `finally` block are often a result of the bad state that caused an exception in the `try` block in the first place.  By concealing the `try` block exceptions, the root cause analysis of the failure becomes more difficult.  The `try-with-resources` feature gives an easy way to express a set of resources to be closed in order, with exceptions that occur properly suppressed into a superseding exception when a superseding exception has occurred.
 
