@@ -132,8 +132,8 @@ Ugh.  This code hurts to read.  Assuming the `processException` method would be 
 	import com.github.richardroda.util.closeit.*;
 	...
     public void useContextAndExecutorService(Context ctx, ExecutorService es) throws NamingException, InterruptedException {
-        try (CloseIt1<NamingException> thing1 = ctx::close;
-             CloseIt1<InterruptedException> thing2 = ()-> {
+        try (CloseIt1<NamingException> outer = ctx::close;
+             CloseIt1<InterruptedException> inner = ()-> {
                  es.shutdown();
                  es.awaitTermination(1, TimeUnit.DAYS);}) 
         {
