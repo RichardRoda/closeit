@@ -50,6 +50,8 @@ The CloseIt interfaces provide a series of generic interfaces that are parameter
 
 This example shows how to define multiple `CloseIt` lambdas in a single `try-with-resources` construct, when an outer resource must be closed when the creation of an inner resource fails.
 
+	import com.github.richardroda.util.closeit.*;
+	...
     public void searchLdap(DirContext ctx) throws NamingException {
         NamingEnumeration<SearchResult> searchResult;
         try (CloseIt1<NamingException> outer = ctx::close;
