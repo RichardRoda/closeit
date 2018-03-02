@@ -146,6 +146,24 @@ public class TestCloseit {
         }
     }
     
+    @Test(expectedExceptions = CloneNotSupportedException.class)
+    public void testHideException() {
+        try(CloseIt0 it = CloseIt0.hideException(this::closeThrowChecked)) {
+        }        
+    }
+    
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testWrapException() {
+        try(CloseIt0 it = CloseIt0.wrapException(this::closeThrowChecked)) {
+        }        
+    }
+
+    @Test
+    public void ignoreCheckedException() {
+        try(CloseIt0 it = CloseIt0.toCloseIt0(this::closeThrowChecked, ex->null)) {
+        }
+    }
+    
      protected void close() {
         isClosed = true;
         closeMethodsCalled.add(CloseMethodsTested.CLOSE);
@@ -176,6 +194,10 @@ public class TestCloseit {
         closeMethodsCalled.add(CloseMethodsTested.CLOSE5);
     }
 
+    protected void closeThrowChecked() throws CloneNotSupportedException {
+        isClosed = true; // To satisfy test post condition.
+        throw new CloneNotSupportedException();
+    }
 }
 /*
 BSD 2-Clause License
