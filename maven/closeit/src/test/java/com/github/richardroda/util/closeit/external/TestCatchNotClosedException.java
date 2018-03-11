@@ -38,7 +38,7 @@ public class TestCatchNotClosedException {
 
         @Test
         public void testCatchCloseAllThrowable() {
-            try (CloseIt0 it = CloseIt0.wrapAllException(this::closeThrowError)) {
+            try (CloseIt0 it = CloseIt0.wrapAllThrowable(this::closeThrowError)) {
                 
             } catch (NotClosedException ex) {
                 log.warning("Exception occurred when closing resource " + ex.getCause());
