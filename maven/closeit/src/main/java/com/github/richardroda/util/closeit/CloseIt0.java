@@ -14,20 +14,56 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface CloseIt0 extends AutoCloseable {
 
+    /**
+     * Close the underlying object.  May also be decorated (wrapped) with
+     * behavior to process the close exception.
+     * 
+     * @throws NotClosedException Thrown when this is created using
+     * {@link #wrapException(java.lang.AutoCloseable) } and a checked exception
+     * occurs, or {@link #wrapAllException(java.lang.AutoCloseable) } and any
+     * exception occurs, or {@link #wrapAllThrowable(java.lang.AutoCloseable) }
+     * and any {@link Throwable} occurs.
+     */
     @Override
-    public void close();
+    public void close() throws NotClosedException;
 
     /**
      * Convert an {@link AutoCloseable} into a {@link CloseIt0} which throws
-     * no checked exceptions.  Any checked exception is wrapped within an
-     * {@link IllegalStateException}.
+     * no checked exceptions by wrapping any checked exceptions to a 
+     * {@link NotClosedException}.
      * @param autoCloseable An autoCloseable object or lambda.
      * @return A {@code CloseIt0} which wraps any checked exceptions in
-     * a {@code IllegalStateException}.
+     * a {@code NotClosedException}.
      * @see #toCloseIt0(java.lang.AutoCloseable, java.util.function.Function) 
      */
     public static CloseIt0 wrapException(AutoCloseable autoCloseable) {
-        return toCloseIt0(autoCloseable, IllegalStateException::new);
+        return toCloseIt0(autoCloseable, NotClosedException::new);
+    }
+
+    /**
+     * Convert an {@link AutoCloseable} into a {@link CloseIt0} which throws
+     * no checked exceptions by wrapping all exceptions (including runtime exceptions)
+     * to a {@link NotClosedException}.
+     * @param autoCloseable An autoCloseable object or lambda.
+     * @return A {@code CloseIt0} which wraps all exceptions in
+     * a {@code NotClosedException}.
+     * @see #toCloseIt0AllException(java.lang.AutoCloseable, java.util.function.Function) 
+     */
+    public static CloseIt0 wrapAllException(AutoCloseable autoCloseable) {
+        return toCloseIt0AllException(autoCloseable, NotClosedException::new);
+    }
+
+    /**
+     * Convert an {@link AutoCloseable} into a {@link CloseIt0} which throws
+     * no checked exceptions by wrapping all throwables to a 
+     * {@link NotClosedException}.
+     * @param autoCloseable An autoCloseable object or lambda.
+     * @return A {@code CloseIt0} which wraps all {@link Throwable} in
+     * a {@code NotClosedException}.
+     * @see #toCloseIt0AllThrowable(java.lang.AutoCloseable, java.util.function.Function) 
+     */
+    public static CloseIt0 wrapAllThrowable(AutoCloseable autoCloseable) {
+        return toCloseIt0AllThrowable(autoCloseable, NotClosedException::new);
     }
 
     /**
@@ -38,7 +74,7 @@ public interface CloseIt0 extends AutoCloseable {
      * care, as it violates the normal Java {@code throws} contract.  Since
      * calling code will not be expecting a checked exception, unpredictable
      * results may occur.  Consider using {@link #wrapException(java.lang.AutoCloseable) } 
-     * which wraps any checked exceptions within an {@link IllegalStateException}.
+     * which wraps any checked exceptions within an {@link NotClosedException}.
      * 
      * @param autoCloseable An autoCloseable object or lambda.
      * @return A {@code CloseIt0} which hides any checked exceptions from the
@@ -60,8 +96,7 @@ public interface CloseIt0 extends AutoCloseable {
      * {@code ex->null } would ignore (not throw) all checked exceptions (not 
      * recommended).  Another example: using {@code IllegalStateException::new}
      * will cause any checked exception to be wrapped within an 
-     * {@link IllegalStateException}.  The {@link #wrapException(java.lang.AutoCloseable) }
-     * method does exactly that to produce its return value.
+     * {@link IllegalStateException}.
      * 
      * @return A {@code CloseIt0} which uses an {@code exceptionMapper} to
      * map any checked exceptions to unchecked exceptions.
@@ -77,6 +112,71 @@ public interface CloseIt0 extends AutoCloseable {
             } catch (RuntimeException ex) {
                 throw ex;
             } catch (Exception ex) {
+                RuntimeException rex = exceptionMapper.apply(ex);
+                if (rex != null) {
+                    throw rex;
+                }
+            }
+        };
+    }    
+
+    /**
+     * Create a {@link CloseIt0} from an {@link AutoCloseable} that
+     * uses a {@link Function} to map all exceptions (checked and unchecked) to
+     * a {@link RuntimeException}.
+     * @param autoCloseable AutoCloseable object or lambda.
+     * @param exceptionMapper Function to map all exceptions (both checked and
+     * unchecked).  A {@code null} return value, means to swallow (ignore) the
+     * exception, so 
+     * {@code ex->null } would ignore (not throw) all exceptions (not 
+     * recommended).  Another example: using {@code IllegalStateException::new}
+     * will cause all exceptions to be wrapped within an 
+     * {@link IllegalStateException}. 
+     * 
+     * @return A {@code CloseIt0} which uses an {@code exceptionMapper} to
+     * map all exceptions to an unchecked exception.
+     */
+    public static CloseIt0 toCloseIt0AllException(AutoCloseable autoCloseable,
+             Function<? super Exception, ? extends RuntimeException> exceptionMapper) {
+        Objects.requireNonNull(autoCloseable, "autoCloseable required");
+        Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
+
+        return () -> {
+            try {
+                autoCloseable.close();
+            } catch (Exception ex) {
+                RuntimeException rex = exceptionMapper.apply(ex);
+                if (rex != null) {
+                    throw rex;
+                }
+            }
+        };
+    }    
+
+    /**
+     * Create a {@link CloseIt0} from an {@link AutoCloseable} that
+     * uses a {@link Function} to map all throwables (checked, unchecked, 
+     * and errors) to a {@link RuntimeException}.
+     * @param autoCloseable AutoCloseable object or lambda.
+     * @param exceptionMapper Function to map all throwables.
+     * A {@code null} return value, means to swallow (ignore) the
+     * throwable, so {@code ex->null } would ignore (not throw) all throwables
+     * (not recommended).  Another example: using {@code IllegalStateException::new}
+     * will cause all exceptions to be wrapped within an 
+     * {@link IllegalStateException}. 
+     * 
+     * @return A {@code CloseIt0} which uses an {@code exceptionMapper} to
+     * map all throwables to an unchecked exception.
+     */
+    public static CloseIt0 toCloseIt0AllThrowable(AutoCloseable autoCloseable,
+             Function<? super Throwable, ? extends RuntimeException> exceptionMapper) {
+        Objects.requireNonNull(autoCloseable, "autoCloseable required");
+        Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
+
+        return () -> {
+            try {
+                autoCloseable.close();
+            } catch (Throwable ex) {
                 RuntimeException rex = exceptionMapper.apply(ex);
                 if (rex != null) {
                     throw rex;

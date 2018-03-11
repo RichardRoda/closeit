@@ -152,9 +152,64 @@ public class TestCloseit {
         }        
     }
     
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test(expectedExceptions = NotClosedException.class)
     public void testWrapException() {
         try(CloseIt0 it = CloseIt0.wrapException(this::closeThrowChecked)) {
+        }        
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testWrapExceptionSuppressed() {
+        try(CloseIt0 it = CloseIt0.wrapException(this::closeThrowChecked)) {
+            throw new IllegalArgumentException();
+        }        
+    }
+
+    @Test(expectedExceptions = ArithmeticException.class)
+    public void testWrapExceptionUnchecked() {
+        try(CloseIt0 it = CloseIt0.wrapException(this::closeThrowUnChecked)) {
+        }        
+    }
+
+    @Test(expectedExceptions = AssertionError.class)
+    public void testWrapExceptionError() {
+        try(CloseIt0 it = CloseIt0.wrapException(this::closeThrowError)) {
+        }        
+    }
+
+    @Test(expectedExceptions = NotClosedException.class)
+    public void testWrapAllException() {
+        try(CloseIt0 it = CloseIt0.wrapAllException(this::closeThrowChecked)) {
+        }        
+    }
+
+    @Test(expectedExceptions = NotClosedException.class)
+    public void testWrapAllExceptionUnchecked() {
+        try(CloseIt0 it = CloseIt0.wrapAllException(this::closeThrowUnChecked)) {
+        }        
+    }
+
+    @Test(expectedExceptions = AssertionError.class)
+    public void testWrapAllExceptionError() {
+        try(CloseIt0 it = CloseIt0.wrapAllException(this::closeThrowError)) {
+        }        
+    }
+
+    @Test(expectedExceptions = NotClosedException.class)
+    public void testWrapAllThrowable() {
+        try(CloseIt0 it = CloseIt0.wrapAllThrowable(this::closeThrowChecked)) {
+        }        
+    }
+
+    @Test(expectedExceptions = NotClosedException.class)
+    public void testWrapAllThrowableUnchecked() {
+        try(CloseIt0 it = CloseIt0.wrapAllThrowable(this::closeThrowUnChecked)) {
+        }        
+    }
+
+    @Test(expectedExceptions = NotClosedException.class)
+    public void testWrapAllThrowableError() {
+        try(CloseIt0 it = CloseIt0.wrapAllThrowable(this::closeThrowError)) {
         }        
     }
 
@@ -194,9 +249,19 @@ public class TestCloseit {
         closeMethodsCalled.add(CloseMethodsTested.CLOSE5);
     }
 
-    protected void closeThrowChecked() throws CloneNotSupportedException {
+    public void closeThrowChecked() throws CloneNotSupportedException {
         isClosed = true; // To satisfy test post condition.
         throw new CloneNotSupportedException();
+    }
+
+    public void closeThrowUnChecked() throws ArithmeticException {
+        isClosed = true; // To satisfy test post condition.
+        throw new ArithmeticException();
+    }
+    
+    public void closeThrowError() throws AssertionError {
+        isClosed = true; // To satisfy test post condition.
+        throw new AssertionError();
     }
 }
 /*
