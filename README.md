@@ -64,7 +64,7 @@ public void searchLdap(DirContext ctx) throws NamingException {
 ```
 The compiler allows the assignment to `searchResult` because the assignment occurs outside the lambda definition.  It is the *result* of the assignment that forms the lambda expression with the close method.
 
-** Example 5: Wrap a Checked Exception from the Close Method **
+**Example 5: Wrap a Checked Exception from the Close Method**
 
 This example shows how to wrap a checked exception from the `close` method into the unchecked `NotClosedException`.  `CloseIt0.wrapException` only wraps checked exceptions.  Note: if a checked exception occurs within the body of the `try-with-resources` block, the `close` exception, if one occurs, will be a suppressed exception and will be wrapped.
 
@@ -78,7 +78,7 @@ public void useContext(Context ctx) {
 }
 ```
 
-** Example 6: Log and Ignore Exceptions That Occur Within the Close Method **
+**Example 6: Log and Ignore Exceptions That Occur Within the Close Method**
 
 This example shows how to log any exceptions that occur within the `close` method when an exception does not occur within the `try-with-resources` block.  `CloseIt0.wrapAllException` wraps all exceptions, both checked and unchecked, that occur within the `close` method.  This allows for attaching a catch clause to the `try-with-resources` block to catch a failed `close` call when there is no exception within the `try-with-resources` block. As above, if an exception occurs in the `try-with-resources` block and the `close` method, the `close` exception will be a suppressed exception that is wrapped within a `NotClosedException`.
 
