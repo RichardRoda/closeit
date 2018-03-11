@@ -64,13 +64,45 @@ public void searchLdap(DirContext ctx) throws NamingException {
 ```
 The compiler allows the assignment to `searchResult` because the assignment occurs outside the lambda definition.  It is the *result* of the assignment that forms the lambda expression with the close method.
 
+** Example 5: Wrap a Checked Exception from the Close Method **
+
+This example shows how to wrap a checked exception from the `close` method into the unchecked `NotClosedException`.  `CloseIt0.wrapException` only wraps checked exceptions.  Note: if a checked exception occurs within the body of the `try-with-resources` block, the `close` exception, if one occurs, will be a suppressed exception and will be wrapped.
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void useContext(Context ctx) {
+    try(CloseIt0 it = CloseIt0.wrapException(ctx::close)) {
+        doSomethingWithContext(ctx); // Throws no checked exceptions.
+    }
+}
+```
+
+** Example 6: Log and Ignore Exceptions That Occur Within the Close Method **
+
+This example shows how to log any exceptions that occur within the `close` method when an exception does not occur within the `try-with-resources` block.  `CloseIt0.wrapAllException` wraps all exceptions, both checked and unchecked, that occur within the `close` method.  This allows for attaching a catch clause to the `try-with-resources` block to catch a failed `close` call when there is no exception within the `try-with-resources` block. As above, if an exception occurs in the `try-with-resources` block and the `close` method, the `close` exception will be a suppressed exception that is wrapped within a `NotClosedException`.
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void useContext(Context ctx) throws NamingException {
+    try(CloseIt0 it = CloseIt0.wrapAllException(ctx::close)) {
+        doSomethingWithContext(ctx);
+    } catch (NotClosedException ex) {
+        log.warning("Exception occurred when closing resource " + ex.getCause());
+    }
+}
+```
+
+Note: `CloseIt0.wrapException` could be used in this example if only checked exceptions are to be ignored and logged.  There is also a `CloseIt0.wrapAllThrowable` that wraps any throwable that occurs within the `close` method.
+
 ## CloseIt as a finally replacement ##
 
 The CloseIt interfaces with a lambda expression may be used instead of a `finally` block.  There are good reasons for doing so.  The `try-with-resources` feature was created because exceptions that occur when closing resources within a `finally` block can interfere with the processing of other resources, and exceptions within the `finally` block can conceal exceptions within the `try` block.  Concealing exceptions within the `try` block is particularly problematic because the exceptions in the `finally` block are often a result of the bad state that caused an exception in the `try` block in the first place.  By concealing the `try` block exceptions, the root cause analysis of the failure becomes more difficult.  The `try-with-resources` feature gives an easy way to express a set of resources to be closed in order, with exceptions that occur properly suppressed into a superseding exception when a superseding exception has occurred.
 
 The above issues of exception hiding and execution interference can exist with *any* finally block, not just resource blocks.  Any method called within a finally block may throw an exception or error.  The lack of a `throws` clause is no guarantee that a `RuntimeException` will not be thrown by a given method call.  For this reason, a project may consider replacing `finally` blocks with `try-with-resources` lambdas.  Here is an example of code that has finally clause issues.
 
-**Example 5: Problematic Finally block**
+**Example 7: Problematic Finally block**
 ```java
 public void useContextAndExecutorService(Context ctx, ExecutorService es) throws NamingException, InterruptedException {
     try {
@@ -84,7 +116,7 @@ public void useContextAndExecutorService(Context ctx, ExecutorService es) throws
 ```
 There are issues with these 7 lines of code.  If the call to `shutdown` or `awaitTermination` throws an exception, `close` is never called on the context.  Also, any exception in the `finally` block will discard an exception from the `try` block.  We want to cleanup all all resources, and suppress any exceptions that occur in the `finally` clause while throwing the original exception.
 
-**Example 6: Handle and Suppress all Exceptions**
+**Example 8: Handle and Suppress all Exceptions**
 ```java
 public void useContextAndExecutorService(Context ctx, ExecutorService es) throws NamingException, InterruptedException {
     Throwable originalException = null;
@@ -128,7 +160,7 @@ private Throwable processException(Throwable originalException, Throwable ex) {
 ```
 Ugh.  This code hurts to read.  Assuming the `processException` method would be imported from a common library, it has taken 28 lines of code to use and properly clean up two resources.  More resources would result in correspondingly more nested `try-catch-finally` blocks to process the exceptions and then call the next resource to be cleaned up.  Even worse, there is no compile time enforcement that the list of exceptions in the `multi-catch` will include all of the checked exceptions in the `throws` clause, or will match the checked exceptions that are actually thrown.  Any new or omitted checked exceptions will end up inadvertently nested in the `IllegalStateException` thrown when an exception doesn't match any of the `multi-catch` exceptions.
 
-**Example 7: Rewrite using CloseIt**
+**Example 9: Rewrite using CloseIt**
 ```java  
 import com.github.richardroda.util.closeit.*;
 ...
