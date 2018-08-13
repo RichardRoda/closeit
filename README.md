@@ -89,12 +89,30 @@ public void useContext(Context ctx) throws NamingException {
     try(CloseIt0 it = CloseIt0.wrapAllException(ctx::close)) {
         doSomethingWithContext(ctx);
     } catch (NotClosedException ex) {
-        log.warning("Exception occurred when closing resource " + ex.getCause());
+        logger.log(Level.WARNING, ex.getCause().getMessage(), ex.getCause());
     }
 }
 ```
 
-Note: `CloseIt0.wrapException` could be used in this example if only checked exceptions are to be ignored and logged.  There is also a `CloseIt0.wrapAllThrowable` that wraps any throwable that occurs within the `close` method.
+This technique also works with "traditional" `AutoCloseable` classes.
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void queryDatabase(Connection con) throws SQLException {
+    Statement stmt;
+    ResultSet rs;
+    try (CloseIt0 c1 = CloseIt0.wrapAllException(con);
+            CloseIt0 c2 = CloseIt0.wrapAllException(stmt = con.createStatement());
+                CloseIt0 c3 = CloseIt0.wrapAllException(rs = stmt.executeQuery("select * from foo"))) {
+        processResultSet(rs);
+    } catch (NotClosedException ex) {
+        logger.log(Level.WARNING, ex.getCause().getMessage(), ex.getCause());
+    }
+}
+```
+
+Note: `CloseIt0.wrapException` could be used in these examples if only checked exceptions are to be ignored and logged.  There is also a `CloseIt0.wrapAllThrowable` that wraps any throwable that occurs within the `close` method.
 
 ## CloseIt as a finally replacement ##
 
