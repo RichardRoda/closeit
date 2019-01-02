@@ -78,9 +78,9 @@ public void useContext(Context ctx) {
 }
 ```
 
-**Example 6: Log and Ignore Exceptions That Occur Within the Close Method**
+**Example 6: Catch and Process Exceptions That Occur Within the Close Method**
 
-This example shows how to log any exceptions that occur within the `close` method when an exception does not occur within the `try-with-resources` block.  `CloseIt0.wrapAllException` wraps all exceptions, both checked and unchecked, that occur within the `close` method.  This allows for attaching a catch clause to the `try-with-resources` block to catch a failed `close` call when there is no exception within the `try-with-resources` block. As above, if an exception occurs in the `try-with-resources` block and the `close` method, the `close` exception will be a suppressed exception that is wrapped within a `NotClosedException`.
+This example shows how to catch any exceptions that occur within the `close` method when an exception does not occur within the `try-with-resources` block.  `CloseIt0.wrapAllException` wraps all exceptions, both checked and unchecked, that occur within the `close` method.  This allows for attaching a catch clause to the `try-with-resources` block to catch a failed `close` call when there is no exception within the `try-with-resources` block. As above, if an exception occurs in the `try-with-resources` block and the `close` method, the `close` exception will be a suppressed exception that is wrapped within a `NotClosedException`.
 
 ```java
 import com.github.richardroda.util.closeit.*;
