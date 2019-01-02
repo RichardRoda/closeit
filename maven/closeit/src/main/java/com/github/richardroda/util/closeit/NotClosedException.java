@@ -8,6 +8,9 @@ package com.github.richardroda.util.closeit;
  * when any exception occurs, or {@link CloseIt0#wrapAllThrowable(java.lang.AutoCloseable) }
  * when any throwable occurs.
  * @author Richard
+ * @see CloseIt0#wrapException(java.lang.AutoCloseable) 
+ * @see CloseIt0#wrapAllException(java.lang.AutoCloseable) 
+ * @see CloseIt0#wrapAllThrowable(java.lang.AutoCloseable) 
  */
 public final class NotClosedException extends IllegalStateException {
 

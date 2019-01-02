@@ -1,5 +1,6 @@
 package com.github.richardroda.util.closeit;
 
+import com.github.richardroda.util.closeit.external.BaseTest;
 import java.util.EnumSet;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -17,7 +18,7 @@ import org.testng.annotations.Test;
  * 
  * @author Richard Roda
  */
-public class TestCloseit {
+public class TestCloseit extends BaseTest {
 
     /**
      * Enum to represent each close method that is called.
@@ -30,23 +31,6 @@ public class TestCloseit {
      * Set to track the calling of each close method.
      */
     EnumSet<CloseMethodsTested> closeMethodsCalled = EnumSet.noneOf(CloseMethodsTested.class);
-    
-    boolean isClosed = false;
-    
-    /**
-     * Reset isClosed to false before each test is run.
-     */
-    @BeforeMethod public void resetIsClosed() {
-        isClosed = false;
-    }
-
-    /**
-     * Verify isClosed is true at the conclusion of each test, to verify
-     * that the specified close method was called.
-     */
-    @AfterMethod public void checkIsClosed() {
-        Assert.assertTrue(isClosed);
-    }
     
     /**
      * Before running test methods in this class, reset the close methods called.
@@ -249,20 +233,6 @@ public class TestCloseit {
         closeMethodsCalled.add(CloseMethodsTested.CLOSE5);
     }
 
-    public void closeThrowChecked() throws CloneNotSupportedException {
-        isClosed = true; // To satisfy test post condition.
-        throw new CloneNotSupportedException();
-    }
-
-    public void closeThrowUnChecked() throws ArithmeticException {
-        isClosed = true; // To satisfy test post condition.
-        throw new ArithmeticException();
-    }
-    
-    public void closeThrowError() throws AssertionError {
-        isClosed = true; // To satisfy test post condition.
-        throw new AssertionError();
-    }
 }
 /*
 BSD 2-Clause License

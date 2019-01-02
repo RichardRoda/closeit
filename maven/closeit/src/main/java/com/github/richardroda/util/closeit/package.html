@@ -37,10 +37,18 @@ it throws one checked exception, <code>CloseIt1</code> is used.  Up to five
         }
     }
 </code></pre>
+<p>The <code>CloseIt0</code> interface has static methods to convert an
+<code>AutoClosable</code> by either wrapping, consuming, or ignoring exceptions that
+occur when the <code>close</code> method is called.  The <code>CloseIt1</code>
+interface has static methods to convert an <code>AutoClosable</code> by
+processing (usually wrapping) exceptions that occur from the <code>close()</code>
+method into the exception type specified by the <code>CloseIt1</code> interface.
+This may be used when the exception type that is desired is a checked exception,
+such as a checked application exception.</p>
 </p><p>
 BSD 2-Clause License
 </p><p>
-Copyright &#xa9; 2018, Richard Roda, All rights reserved.
+Copyright &#xa9; 2019, Richard Roda, All rights reserved.
 </p><p>
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

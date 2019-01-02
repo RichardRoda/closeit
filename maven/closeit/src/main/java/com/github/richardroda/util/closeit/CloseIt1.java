@@ -1,18 +1,120 @@
 package com.github.richardroda.util.closeit;
 
+import java.util.Objects;
+import java.util.function.Function;
+
 /**
  * Functional Interface to allow try-with-resources to be used with any lambda
  * expression that throws a single checked exception.
+ *
  * @author Richard Roda
  */
 @FunctionalInterface
 public interface CloseIt1<E extends Exception> extends AutoCloseable {
+
     @Override
     default void close() throws E {
         closeIt();
     }
 
     void closeIt() throws E;
+
+    /**
+     * Create a {@code CloseIt1} from a {@link AutoCloseable} by converting any
+     * checked exception thrown and converting it to the exception specified by
+     * the type variable of the {@code CloseIt1} interface using the supplied
+     * {@code exceptionMapper} {@link Function}.  Unchecked exceptions are
+     * not processed.
+     *
+     * @param autoCloseable AutoCloseable object or lambda.
+     * @param exceptionMapper Function to map an exception to the exception type
+     * specified by the {@code CloseIt1} interface.
+     * @return A {@code CloseIt1} that uses the specified
+     * {@code exceptionMapper} to map any exceptions to the exception type
+     * specified by the {@code CloseIt1} interface.
+     * @see CloseIt0#wrapException(java.lang.AutoCloseable)
+     */
+    public static <E extends Exception> CloseIt1<E> wrapException(AutoCloseable autoCloseable,
+            Function<? super Exception, ? extends E> exceptionMapper) {
+        Objects.requireNonNull(autoCloseable, "autoCloseable required");
+        Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
+
+        return () -> {
+            try {
+                autoCloseable.close();
+            } catch (RuntimeException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                E rex = exceptionMapper.apply(ex);
+                if (rex != null) {
+                    throw rex;
+                }
+            }
+        };
+    }
+
+    /**
+     * Create a {@code CloseIt1} from a {@link AutoCloseable} by converting any
+     * exception thrown and converting it to the exception specified by the type
+     * variable of the {@code CloseIt1} interface using the supplied
+     * {@code exceptionMapper} {@link Function}.
+     *
+     * @param autoCloseable AutoCloseable object or lambda.
+     * @param exceptionMapper Function to map an exception to the exception type
+     * specified by the {@code CloseIt1} interface.
+     * @return A {@code CloseIt1} that uses the specified
+     * {@code exceptionMapper} to map any exceptions to the exception type
+     * specified by the {@code CloseIt1} interface.
+     * @see CloseIt0#wrapAllException(java.lang.AutoCloseable)
+     */
+    public static <E extends Exception> CloseIt1<E> wrapAllException(AutoCloseable autoCloseable,
+            Function<? super Exception, ? extends E> exceptionMapper) {
+        Objects.requireNonNull(autoCloseable, "autoCloseable required");
+        Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
+
+        return () -> {
+            try {
+                autoCloseable.close();
+            } catch (Exception ex) {
+                E rex = exceptionMapper.apply(ex);
+                if (rex != null) {
+                    throw rex;
+                }
+            }
+        };
+    }
+
+    /**
+     * Create a {@code CloseIt1} from a {@link AutoCloseable} by converting any
+     * exception thrown and converting it to the exception specified by the type
+     * variable of the {@code CloseIt1} interface using the supplied
+     * {@code exceptionMapper} {@link Function}.
+     *
+     * @param autoCloseable AutoCloseable object or lambda.
+     * @param exceptionMapper Function to map an exception to the exception type
+     * specified by the {@code CloseIt1} interface.
+     * @return A {@code CloseIt1} that uses the specified
+     * {@code exceptionMapper} to map any exceptions to the exception type
+     * specified by the {@code CloseIt1} interface.
+     * @see CloseIt0#wrapAllThrowable(java.lang.AutoCloseable)
+     */
+    public static <E extends Exception> CloseIt1<E> wrapAllThrowable(AutoCloseable autoCloseable,
+            Function<? super Throwable, ? extends E> exceptionMapper) {
+        Objects.requireNonNull(autoCloseable, "autoCloseable required");
+        Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
+
+        return () -> {
+            try {
+                autoCloseable.close();
+            } catch (Throwable ex) {
+                E rex = exceptionMapper.apply(ex);
+                if (rex != null) {
+                    throw rex;
+                }
+            }
+        };
+    }
+
 }
 /*
 BSD 2-Clause License
@@ -40,4 +142,4 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */

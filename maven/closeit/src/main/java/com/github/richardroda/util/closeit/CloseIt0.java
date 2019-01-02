@@ -1,6 +1,7 @@
 package com.github.richardroda.util.closeit;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -34,7 +35,8 @@ public interface CloseIt0 extends AutoCloseable {
      * @param autoCloseable An autoCloseable object or lambda.
      * @return A {@code CloseIt0} which wraps any checked exceptions in
      * a {@code NotClosedException}.
-     * @see #toCloseIt0(java.lang.AutoCloseable, java.util.function.Function) 
+     * @see #toCloseIt0(java.lang.AutoCloseable, java.util.function.Function)
+     * @see CloseIt1#wrapException(java.lang.AutoCloseable, java.util.function.Function) 
      */
     public static CloseIt0 wrapException(AutoCloseable autoCloseable) {
         return toCloseIt0(autoCloseable, NotClosedException::new);
@@ -48,6 +50,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which wraps all exceptions in
      * a {@code NotClosedException}.
      * @see #toCloseIt0AllException(java.lang.AutoCloseable, java.util.function.Function) 
+     * @see CloseIt1#wrapAllException(java.lang.AutoCloseable, java.util.function.Function) 
      */
     public static CloseIt0 wrapAllException(AutoCloseable autoCloseable) {
         return toCloseIt0AllException(autoCloseable, NotClosedException::new);
@@ -61,6 +64,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which wraps all {@link Throwable} in
      * a {@code NotClosedException}.
      * @see #toCloseIt0AllThrowable(java.lang.AutoCloseable, java.util.function.Function) 
+     * @see CloseIt1#wrapAllThrowable(java.lang.AutoCloseable, java.util.function.Function) 
      */
     public static CloseIt0 wrapAllThrowable(AutoCloseable autoCloseable) {
         return toCloseIt0AllThrowable(autoCloseable, NotClosedException::new);
@@ -85,6 +89,103 @@ public interface CloseIt0 extends AutoCloseable {
         return toCloseIt0(autoCloseable, CloseItHelper::hideException);
     }
     
+    /**
+     * Convert an {@link AutoCloseable} into a {@link CloseIt0} which ignores
+     * all checked exceptions.  Unchecked exceptions are re-thrown.
+     * @param autoCloseable An autoCloseable object or lambda.
+     * @return A {@code CloseIt0} which ignores (does not rethrow) any checked
+     * exception.
+     */
+    public static CloseIt0 ignoreException(AutoCloseable autoCloseable) {
+        return consumeException(autoCloseable, CloseItHelper::noOp);
+    }
+    
+    /**
+     * Convert an {@link AutoCloseable} into a {@link CloseIt0} which consumes
+     * all checked exceptions.  Unchecked exceptions are re-thrown.
+     * @param autoCloseable An autoCloseable object or lambda.
+     * @param exConsumer Consumer to apply an operation to the processed exception
+     * @return A {@code CloseIt0} which consumes (does not rethrow) any checked
+     * exception, but accepts them with the provided consumer.
+     */
+    public static CloseIt0 consumeException(AutoCloseable autoCloseable
+        , Consumer<? super Exception> exConsumer) {
+        Objects.requireNonNull(autoCloseable, "autoCloseable required");
+        Objects.requireNonNull(exConsumer, "exConsumer required");
+        return () -> {
+          try {
+              autoCloseable.close();
+          } catch (RuntimeException ex) {
+              throw ex;
+          } catch (Exception ex) {
+              exConsumer.accept(ex);
+          }
+        };
+    }
+    
+    /**
+     * Convert an {@link AutoCloseable} into a {@link CloseIt0} which ignores
+     * all exceptions (including runtime exceptions).
+     * @param autoCloseable An autoCloseable object or lambda.
+     * @return A {@code CloseIt0} which ignores (does not rethrow) any
+     * exception.
+     */
+    public static CloseIt0 ignoreAllException(AutoCloseable autoCloseable) {
+        return consumeAllException(autoCloseable, CloseItHelper::noOp);
+    }
+    
+    /**
+     * Convert an {@link AutoCloseable} into a {@link CloseIt0} which consumes
+     * all exceptions (including runtime exceptions).
+     * @param autoCloseable An autoCloseable object or lambda.
+     * @param exConsumer Consumer to apply an operation to the processed exception
+     * @return A {@code CloseIt0} which consumes (does not rethrow) any
+     * exception, but accepts them with the provided consumer.
+     */
+    public static CloseIt0 consumeAllException(AutoCloseable autoCloseable
+        , Consumer<? super Exception> exConsumer) {
+        Objects.requireNonNull(autoCloseable, "autoCloseable required");
+        Objects.requireNonNull(exConsumer, "exConsumer required");
+        return () -> {
+          try {
+              autoCloseable.close();
+          } catch (Exception ex) {
+              exConsumer.accept(ex);
+          }
+        };
+    }
+    
+    /**
+     * Convert an {@link AutoCloseable} into a {@link CloseIt0} which ignores
+     * all throwables (including checked, unchecked exceptions and errors).
+     * @param autoCloseable An autoCloseable object or lambda.
+     * @return A {@code CloseIt0} which ignores (does not rethrow) any throwable.
+     */
+    public static CloseIt0 ignoreAllThrowable(AutoCloseable autoCloseable) {
+        return consumeAllThrowable(autoCloseable, CloseItHelper::noOp);
+    }
+    
+    /**
+     * Convert an {@link AutoCloseable} into a {@link CloseIt0} which consumes
+     * all throwables (including checked, unchecked exceptions and errors).
+     * @param autoCloseable An autoCloseable object or lambda.
+     * @param exConsumer Consumer to apply an operation to the processed throwable
+     * @return A {@code CloseIt0} which consumes (does not rethrow) any throwable
+     * exception, but accepts them with the provided consumer.
+     */
+    public static CloseIt0 consumeAllThrowable(AutoCloseable autoCloseable
+        , Consumer<? super Throwable> exConsumer) {
+        Objects.requireNonNull(autoCloseable, "autoCloseable required");
+        Objects.requireNonNull(exConsumer, "exConsumer required");
+        return () -> {
+          try {
+              autoCloseable.close();
+          } catch (Throwable ex) {
+              exConsumer.accept(ex);
+          }
+        };
+    }
+
     /**
      * Create a {@link CloseIt0} from an {@link AutoCloseable} that
      * uses a {@link Function} to map any checked exceptions to

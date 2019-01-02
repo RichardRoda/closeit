@@ -14,9 +14,8 @@ import org.testng.annotations.Test;
  *
  * @author Richard
  */
-public class TestCatchNotClosedException {
+public class TestCatchNotClosedException extends BaseTest {
 
-    static final Logger log = Logger.getLogger(TestCatchNotClosedException.class.getName());
     
         @Test
         public void testCatchCloseException() {
@@ -45,16 +44,5 @@ public class TestCatchNotClosedException {
             }
         }
 
-    public void closeThrowChecked() throws CloneNotSupportedException {
-        throw new CloneNotSupportedException();
-    }
-
-    public void closeThrowUnChecked() throws ArithmeticException {
-        throw new ArithmeticException();
-    }
-    
-    public void closeThrowError() throws AssertionError {
-        throw new AssertionError();
-    }
 
 }
