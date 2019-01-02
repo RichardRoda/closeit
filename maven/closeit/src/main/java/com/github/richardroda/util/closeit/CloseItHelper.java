@@ -14,7 +14,7 @@ class CloseItHelper {
      * @param th The exception to conceal.
      * @return Method never returns, but return value is declared to allow it
      * to be used in a functional lambda that expects a runtime exception to
-     * be returned.0
+     * be returned.
      * @throws RuntimeException The actual exception thrown is th, but it is
      * made to appear to the compiler as a runtime exception.
      */
@@ -22,5 +22,9 @@ class CloseItHelper {
         return hideException(th, RuntimeException.class);
     }
     
+    /**
+     * A no-op consumer for a throwable.
+     * @param th Throwable to consume.
+     */
     static void noOp(Throwable th){}
 }

@@ -6,9 +6,12 @@ import java.util.function.Function;
 
 /**
  * Functional Interface to allow a lambda that throws no checked exceptions to
- * be used with a try-with-resources construct.  Also has static utility
+ * be used with a try-with-resources construct.  It also has static utility
  * methods to convert an {@code AutoCloseable} into this interface by
- * specifying how checked exceptions should be mapped.
+ * specifying how exceptions should be wrapped, hidden, ignored, or consumed.
+ * The static utility methods use the <a href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>
+ * to enhance the provided {@code AutoClosable} with additional behaviors that
+ * occur when the {@code close()} method throws an exception.
  *
  * @author Richard Roda
  */

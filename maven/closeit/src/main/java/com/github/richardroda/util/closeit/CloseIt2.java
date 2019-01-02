@@ -2,7 +2,7 @@ package com.github.richardroda.util.closeit;
 
 /**
  * Functional Interface to allow try-with-resources to be used with any lambda
- * expression that throws a two checked exceptions.
+ * expression that throws two checked exceptions.
  * @author Richard Roda
  */
 @FunctionalInterface

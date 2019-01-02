@@ -6,8 +6,13 @@ package com.github.richardroda.util.closeit;
  * {@link CloseIt0#wrapException(java.lang.AutoCloseable) } when a checked
  * exception occurs, or {@link CloseIt0#wrapAllException(java.lang.AutoCloseable) }
  * when any exception occurs, or {@link CloseIt0#wrapAllThrowable(java.lang.AutoCloseable) }
- * when any throwable occurs.
- * @author Richard
+ * when any throwable occurs.  This class is final and defines its constructor
+ * as package private to provide some guarantee that this exception can only
+ * originate from a close method of a decorated {@code AutoClosable}.  If another
+ * kind of exception needs to be caught, consider using a {@code multi-catch}
+ * with this exception and the other exceptions that need to be handled.
+ * 
+ * @author Richard Roda
  * @see CloseIt0#wrapException(java.lang.AutoCloseable) 
  * @see CloseIt0#wrapAllException(java.lang.AutoCloseable) 
  * @see CloseIt0#wrapAllThrowable(java.lang.AutoCloseable) 

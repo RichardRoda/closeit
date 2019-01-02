@@ -5,7 +5,12 @@ import java.util.function.Function;
 
 /**
  * Functional Interface to allow try-with-resources to be used with any lambda
- * expression that throws a single checked exception.
+ * expression that throws a single checked exception.  It also has static utility
+ * methods to convert an {@code AutoCloseable} into this interface by
+ * specifying how exceptions should be wrapped into the specified checked exception.
+ * The static utility methods use the <a href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>
+ * to enhance the provided {@code AutoClosable} with the wrapping behavior that
+ * occurs when the {@code close()} method throws an exception.
  *
  * @author Richard Roda
  */
@@ -86,15 +91,15 @@ public interface CloseIt1<E extends Exception> extends AutoCloseable {
 
     /**
      * Create a {@code CloseIt1} from a {@link AutoCloseable} by converting any
-     * exception thrown and converting it to the exception specified by the type
+     * throwable thrown and converting it to the exception specified by the type
      * variable of the {@code CloseIt1} interface using the supplied
      * {@code exceptionMapper} {@link Function}.
      *
      * @param autoCloseable AutoCloseable object or lambda.
-     * @param exceptionMapper Function to map an exception to the exception type
+     * @param exceptionMapper Function to map a throwable to the exception type
      * specified by the {@code CloseIt1} interface.
      * @return A {@code CloseIt1} that uses the specified
-     * {@code exceptionMapper} to map any exceptions to the exception type
+     * {@code exceptionMapper} to map any throwables to the exception type
      * specified by the {@code CloseIt1} interface.
      * @see CloseIt0#wrapAllThrowable(java.lang.AutoCloseable)
      */

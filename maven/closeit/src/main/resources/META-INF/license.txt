@@ -3,7 +3,7 @@ the requirement that redistributions in binary form reproduce this license.
 
 BSD 2-Clause License
 
-Copyright (c) 2018, Richard Roda
+Copyright (c) 2019, Richard Roda
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

@@ -37,14 +37,19 @@ it throws one checked exception, <code>CloseIt1</code> is used.  Up to five
         }
     }
 </code></pre>
-<p>The <code>CloseIt0</code> interface has static methods to convert an
-<code>AutoClosable</code> by either wrapping, consuming, or ignoring exceptions that
-occur when the <code>close</code> method is called.  The <code>CloseIt1</code>
+</p><p>The <code>CloseIt0</code> interface has static methods to convert an
+<code>AutoClosable</code> using the <a href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a> 
+by either wrapping, consuming, or ignoring exceptions that
+occur when the <code>close()</code> method is called.  The <code>CloseIt1</code>
 interface has static methods to convert an <code>AutoClosable</code> by
 processing (usually wrapping) exceptions that occur from the <code>close()</code>
 method into the exception type specified by the <code>CloseIt1</code> interface.
 This may be used when the exception type that is desired is a checked exception,
-such as a checked application exception.</p>
+such as a checked application exception.
+</p><p>
+    The inclusion of a license.txt file in the META-INF directory of the 
+    distributable .jar file with this license satisfies the requirement that
+    this license be included in redistributions in binary form.
 </p><p>
 BSD 2-Clause License
 </p><p>
@@ -78,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @see javax.naming.Context
 @see java.util.concurrent.ExecutorService
 @see java.lang.Exception
-</p>
+
 </BODY>
 </HTML>
 
