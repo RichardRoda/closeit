@@ -78,6 +78,26 @@ public void useContext(Context ctx) {
     }
 }
 ```
+This technique also works with "traditional" `AutoCloseable` classes.
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void queryDatabase(Connection con) throws SQLException {
+    Statement stmt;
+    ResultSet rs;
+    try (CloseIt0 c1 = CloseIt0.consumeAllException(con, 
+         exception->logger.log(Level.WARNING, exception.getMessage(), exception));
+            CloseIt0 c2 = CloseIt0.consumeAllException(stmt = con.createStatement(), 
+            exception->logger.log(Level.WARNING, exception.getMessage(), exception));
+                CloseIt0 c3 = CloseIt0.consumeAllException(rs = stmt.executeQuery("select * from foo"), 
+                exception->logger.log(Level.WARNING, exception.getMessage(), exception))) {
+        processResultSet(rs);
+    }
+}
+```
+
+Note: There is an important difference between the processing illustrated here with consume exception, and with catching a `NotClosedException` in Example 8.  In the queryDatabase example above, the close exception will be consumed and logged regardless of the context it is thrown in.  Thus, there will be 0-3 logging statements corresponding to each close method that throws an exception.  In Example 8, 0 or 1 `NotClosedException` are caught and they are not always caught when an exception occurs in a `close()` method.
 
 **Example 6: Ignore Checked Exceptions that Occur Within the Close Method**
 
@@ -109,7 +129,7 @@ public void useContext(Context ctx) {
 
 **Example 8: Catch and Process Exceptions That Occur Within the Close Method**
 
-This example shows how to catch any exceptions that occur within the `close` method when an exception does not occur within the `try-with-resources` block.  `CloseIt0.wrapAllException` wraps all exceptions, both checked and unchecked, that occur within the `close` method.  This allows for attaching a catch clause to the `try-with-resources` block to catch a failed `close` call when there is no exception within the `try-with-resources` block. As above, if an exception occurs in the `try-with-resources` block and the `close` method, the `close` exception will be a suppressed exception that is wrapped within a `NotClosedException`.
+This example shows how to catch any exceptions that occur within the `close` method when an exception does not occur within the `try-with-resources` block.  `CloseIt0.wrapAllException` wraps all exceptions, both checked and unchecked, that occur within the `close` method.  This allows for attaching a catch clause to the `try-with-resources` block to catch a failed `close` call when there is no exception within the `try-with-resources` block. As above, if an exception occurs in the `try-with-resources` block and the `close` method, the `close` exception will be a suppressed exception that is wrapped within a `NotClosedException`.  There is also a `CloseIt0.wrapException` that only wraps checked exceptions, and `CloseIt0.wrapAllThrowable` which wraps any throwable.
 
 ```java
 import com.github.richardroda.util.closeit.*;
@@ -141,7 +161,7 @@ public void queryDatabase(Connection con) throws SQLException {
 }
 ```
 
-Note: `CloseIt0.wrapException` could be used in these examples if only checked exceptions are to be ignored and logged.  There is also a `CloseIt0.wrapAllThrowable` that wraps any throwable that occurs within the `close` method.
+Note: There is an important difference between the processing illustrated here with catching a `NotClosedException`, and consuming an exception in Example 5.  In the queryDatabase example above, the close exception will be caught 0 or 1 times.  The `NotClosedException` will not be caught if an exception occurs in `processResultSet(rs)` but will instead be a suppressed exception attached to the `processResultSet(rs)` exception.  Likewise, if `processResultSet(rs)` does not throw an exception, but multiple `close()` methods throw an exception, the innermost `close()` exception will be caught, and any other `close()` exceptions will be suppressed exceptions of the caught `NotClosedException`.  In Example 5, any exception thrown in a `close()` method is *always* consumed by the consumer.
 
 **Example 9: Wrap Close Exceptions in an Application Checked Exception**
 
