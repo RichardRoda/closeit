@@ -6,12 +6,12 @@ This project is available from Maven Central Repository.  To use it, add the fol
 <dependency>
     <groupId>com.github.richardroda.util</groupId>
     <artifactId>closeit</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
 </dependency>
 ```
 Use this dependency for Gradle
 
-	compile "com.github.richardroda.util:closeit:1.3"
+	compile "com.github.richardroda.util:closeit:1.4"
 
 Java 7 introduced a useful feature known as the `try-with-resources` construct. In order to take advantage of it, a class must implement `AutoCloseable`. However, there are classes that could benefit from this interface that do not implement it. Two examples are `Context` and `ExecutorService`. Although `AutoCloseable` is a functional interface because it implements exactly 1 abstract method, it is often not what is needed as a lambda target because `AutoCloseable::close` throws `Exception`. 
 
@@ -64,7 +64,36 @@ public void searchLdap(DirContext ctx) throws NamingException {
 ```
 The compiler allows the assignment to `searchResult` because the assignment occurs outside the lambda definition.  It is the *result* of the assignment that forms the lambda expression with the close method.
 
-**Example 5: Wrap a Checked Exception from the Close Method**
+**Example 5: Consume Exceptions that Occur Within the Close Method**
+
+This example shows how to consume an exception (both checked an unchecked) that occurs within the close method.  The consumed exception is not re-thrown.  In the case of  consuming an exception, the exception is not wrapped: the consumer gets the actual  exception thrown by the `close()` method.  There is also a `CloseIt0.consumeException` method which only consumes checked exceptions, and a `CloseIt0.consumeAllThrowable` which consumes all throwables.
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void useContext(Context ctx) {
+    try(CloseIt0 it = CloseIt0.consumeAllException(ctx::close, 
+            exception->logger.log(Level.WARNING, exception.getMessage(), exception))) {
+        doSomethingWithContext(ctx); // Throws no checked exceptions.
+    }
+}
+```
+
+**Example 6: Ignore Checked Exceptions that Occur Within the Close Method**
+
+This example shows how to ignore a checked exception that occurs within a close method.  There is also a `CloseIt0.ignoreAllException` which ignores all exceptions (checked and unchecked) and `CloseIt0.ignoreAllThrowable` which ignores all throwables.
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void useContext(Context ctx) {
+    try(CloseIt0 it = CloseIt0.ignoreException(ctx::close)) {
+        doSomethingWithContext(ctx); // Throws no checked exceptions.
+    }
+}
+```
+
+**Example 7: Wrap a Checked Exception from the Close Method**
 
 This example shows how to wrap a checked exception from the `close` method into the unchecked `NotClosedException`.  `CloseIt0.wrapException` only wraps checked exceptions.  Note: if a checked exception occurs within the body of the `try-with-resources` block, the `close` exception, if one occurs, will be a suppressed exception and will be wrapped.
 
@@ -78,7 +107,7 @@ public void useContext(Context ctx) {
 }
 ```
 
-**Example 6: Catch and Process Exceptions That Occur Within the Close Method**
+**Example 8: Catch and Process Exceptions That Occur Within the Close Method**
 
 This example shows how to catch any exceptions that occur within the `close` method when an exception does not occur within the `try-with-resources` block.  `CloseIt0.wrapAllException` wraps all exceptions, both checked and unchecked, that occur within the `close` method.  This allows for attaching a catch clause to the `try-with-resources` block to catch a failed `close` call when there is no exception within the `try-with-resources` block. As above, if an exception occurs in the `try-with-resources` block and the `close` method, the `close` exception will be a suppressed exception that is wrapped within a `NotClosedException`.
 
@@ -114,13 +143,27 @@ public void queryDatabase(Connection con) throws SQLException {
 
 Note: `CloseIt0.wrapException` could be used in these examples if only checked exceptions are to be ignored and logged.  There is also a `CloseIt0.wrapAllThrowable` that wraps any throwable that occurs within the `close` method.
 
+**Example 9: Wrap Close Exceptions in an Application Checked Exception**
+
+This example shows how to wrap a checked close exception in an application exception.  As above, it may be used both with lambda expressions and "traditional" autocloseables.  If an exception occurs in the `try-with-resources` block and the `close` method, the `close` exception will be a suppressed exception that is wrapped within the application exception.  There is also a `CloseIt1.wrapAllException` which will wrap both checked and unchecked exceptions, and `CloseIt1.wrapAllThrowable` which will wrap all throwables.  In this example, it is assumed that there is an exception class called `AppException` with a public constructor that takes a single argument of type `Throwable`.
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void useContext(Context ctx) throws AppException {
+    try(CloseIt1<AppException> it = CloseIt1.wrapException(ctx::close, AppException::new)) {
+        doSomethingWithContext(ctx); // Throws AppException.
+    }
+}
+```
+
 ## CloseIt as a finally replacement ##
 
 The CloseIt interfaces with a lambda expression may be used instead of a `finally` block.  There are good reasons for doing so.  The `try-with-resources` feature was created because exceptions that occur when closing resources within a `finally` block can interfere with the processing of other resources, and exceptions within the `finally` block can conceal exceptions within the `try` block.  Concealing exceptions within the `try` block is particularly problematic because the exceptions in the `finally` block are often a result of the bad state that caused an exception in the `try` block in the first place.  By concealing the `try` block exceptions, the root cause analysis of the failure becomes more difficult.  The `try-with-resources` feature gives an easy way to express a set of resources to be closed in order, with exceptions that occur properly suppressed into a superseding exception when a superseding exception has occurred.
 
 The above issues of exception hiding and execution interference can exist with *any* finally block, not just resource blocks.  Any method called within a finally block may throw an exception or error.  The lack of a `throws` clause is no guarantee that a `RuntimeException` will not be thrown by a given method call.  For this reason, a project may consider replacing `finally` blocks with `try-with-resources` lambdas.  Here is an example of code that has finally clause issues.
 
-**Example 7: Problematic Finally block**
+**Example 10: Problematic Finally block**
 ```java
 public void useContextAndExecutorService(Context ctx, ExecutorService es) throws NamingException, InterruptedException {
     try {
@@ -134,7 +177,7 @@ public void useContextAndExecutorService(Context ctx, ExecutorService es) throws
 ```
 There are issues with these 7 lines of code.  If the call to `shutdown` or `awaitTermination` throws an exception, `close` is never called on the context.  Also, any exception in the `finally` block will discard an exception from the `try` block.  We want to cleanup all all resources, and suppress any exceptions that occur in the `finally` clause while throwing the original exception.
 
-**Example 8: Handle and Suppress all Exceptions**
+**Example 11: Handle and Suppress all Exceptions**
 ```java
 public void useContextAndExecutorService(Context ctx, ExecutorService es) throws NamingException, InterruptedException {
     Throwable originalException = null;
@@ -178,7 +221,7 @@ private Throwable processException(Throwable originalException, Throwable ex) {
 ```
 Ugh.  This code hurts to read.  Assuming the `processException` method would be imported from a common library, it has taken 28 lines of code to use and properly clean up two resources.  More resources would result in correspondingly more nested `try-catch-finally` blocks to process the exceptions and then call the next resource to be cleaned up.  Even worse, there is no compile time enforcement that the list of exceptions in the `multi-catch` will include all of the checked exceptions in the `throws` clause, or will match the checked exceptions that are actually thrown.  Any new or omitted checked exceptions will end up inadvertently nested in the `IllegalStateException` thrown when an exception doesn't match any of the `multi-catch` exceptions.
 
-**Example 9: Rewrite using CloseIt**
+**Example 12: Rewrite using CloseIt**
 ```java  
 import com.github.richardroda.util.closeit.*;
 ...
@@ -192,7 +235,7 @@ public void useContextAndExecutorService(Context ctx, ExecutorService es) throws
     }
 }
 ```
-Ah, much better.  What took 28 lines to accomplish above has been condensed back to 7 lines like the original `try` and `finally` blocks.  It is easier to see that the code is cleaning up two resources that it uses in the `try` block.  Substituting the `finally` clause with the `try-with-resourses` lets the compiler and Java run time deal with the ugly details of nesting and re-throwing the exceptions, while the programmer can focus on the problem at hand. Unlike the code in Example 6, there is compile time checking of all the exceptions that are thrown within the `try-with-resources` construct.  
+Ah, much better.  What took 28 lines to accomplish above has been condensed back to 7 lines like the original `try` and `finally` blocks.  It is easier to see that the code is cleaning up two resources that it uses in the `try` block.  Substituting the `finally` clause with the `try-with-resourses` lets the compiler and Java run time deal with the ugly details of nesting and re-throwing the exceptions, while the programmer can focus on the problem at hand. Unlike the code in Example 11, there is compile time checking of all the exceptions that are thrown within the `try-with-resources` construct.  
 
 There is a trick to converting `finally` blocks to `try-with-resources`.  The lambdas must be declared in the *opposite* order they are cleaned up in a `finally` clause.  Note that `ctx::close` is declared first, but will be executed last.  When reasoning about this, you may think of the lambdas as being like code blocks, the inner code block will exit first, followed by the outer code block.  Likewise the "inner" cleanup lambda code will run before the "outer" lambda cleanup code.
 
