@@ -188,6 +188,21 @@ public void useContext(Context ctx) throws AppException {
     }
 }
 ```
+**Example 10: Hide Close Exceptions**
+
+This example shows how to hide exceptions from the compiler.  The exceptions are thrown as-is, but they are "hidden" from the compiler and checked exceptions are not flagged as a compilation error.  This should be used with caution because it breaks the Java programming language invariant of declaring checked exceptions.  Calling code may not behave correctly when confronted with an undeclared checked exception.
+
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void hideException(Context ctx) {
+    try (CloseIt0 it = CloseIt0.hideException(ctx::close)) {
+        doSomethingWithContext(ctx);
+    }
+}
+```
+
 
 ## CloseIt as a finally replacement ##
 
@@ -195,7 +210,7 @@ The CloseIt interfaces with a lambda expression may be used instead of a `try-fi
 
 The above issues of exception hiding and execution interference can exist with *any* finally block, not just resource blocks.  Any method called within a finally block may throw an exception or error.  The lack of a `throws` clause is no guarantee that a `RuntimeException` will not be thrown by a given method call.  For this reason, a project may consider replacing `finally` blocks with `try-with-resources` lambdas.  Here is an example of code that has finally clause issues.
 
-**Example 10: Problematic Finally block**
+**Example 11: Problematic Finally block**
 ```java
 public void useContextAndExecutorService(Context ctx, ExecutorService es) throws NamingException, InterruptedException {
     try {
@@ -210,7 +225,7 @@ public void useContextAndExecutorService(Context ctx, ExecutorService es) throws
 There are issues with these 7 lines of code.  If the call to `shutdown` or `awaitTermination` throws an exception, `close` is never called on the context.  Also, any exception in the `finally` block will discard an exception from the `try` block.  We want to cleanup all all resources, and suppress any exceptions that occur in the `finally` clause while throwing the original exception.
 
 
-**Example 11: Rewrite using CloseIt**
+**Example 12: Rewrite using CloseIt**
 ```java  
 import com.github.richardroda.util.closeit.*;
 ...
