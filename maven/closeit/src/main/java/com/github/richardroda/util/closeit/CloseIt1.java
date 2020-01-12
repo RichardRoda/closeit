@@ -1,7 +1,9 @@
 package com.github.richardroda.util.closeit;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Functional Interface to allow try-with-resources to be used with any lambda
@@ -120,6 +122,74 @@ public interface CloseIt1<E extends Exception> extends AutoCloseable {
         };
     }
 
+    
+    /**
+     * Decorate the lambda with one that processes any {@link Throwable} with a
+     * predicate. The exception is rethrown when the {@code when} predicate
+     * returns {@code true}, otherwise it is not rethrown and effectively
+     * ignored. If the exception should always be rethrown, use
+     * {@link #rethrow(com.github.richardroda.util.closeit.CloseIt1, java.util.function.Consumer) }.
+     * If the exception should never be rethrown, use {@link CloseIt0#consumeAllThrowable(java.lang.AutoCloseable, java.util.function.Consumer)
+     * }.
+     *
+     * @return A decorated lambda that processes any {@link Throwable} that
+     * occurs with a predicate that causes the exception to be rethrown when it
+     * returns {@code true}, and ignored otherwise.
+     * @param <E1> Checked Exception Type
+     * @param closeIt The closeIt lambda. Must not be {@code null}.
+     * @param when Predicate to process exceptions. Must not be {@code null}.
+     * Exception is rethrown when {@code true} is returned, and ignored
+     * otherwise.
+     * @see #rethrow(com.github.richardroda.util.closeit.CloseIt1,
+     * java.util.function.Consumer)
+     * @see CloseIt0#consumeAllThrowable(java.lang.AutoCloseable,
+     * java.util.function.Consumer)
+     * @see CloseIt0#consumeAllException(java.lang.AutoCloseable,
+     * java.util.function.Consumer)
+     * @see CloseIt0#consumeException(java.lang.AutoCloseable,
+     * java.util.function.Consumer)
+     */
+    static <E1 extends Exception>
+            CloseIt1<E1> rethrowWhen(CloseIt1<? extends E1> closeIt, Predicate<? super Throwable> when) {
+        Objects.requireNonNull(closeIt, "closeIt required");
+        Objects.requireNonNull(when, "when required");
+        return () -> {
+            try {
+                closeIt.close();
+            } catch (Throwable th) {
+                if (when.test(th)) {
+                    throw th;
+                }
+            }
+        };
+    }
+
+    /**
+     * Decorate the lambda with one that processes any {@link Throwable} with a
+     * consumer and then rethrows it.
+     *
+     * @return A decorated lambda that processes any {@link Throwable} that
+     * occurs with a consumer and then rethrows it.
+     * @param <E1> Checked Exception Type
+     * @param closeIt The closeIt lambda. Must not be {@code null}.
+     * @param exConsumer Consumer to process exceptions. Must not be
+     * {@code null}.
+     * @see #rethrowWhen(com.github.richardroda.util.closeit.CloseIt1, java.util.function.Predicate) 
+     */
+    static <E1 extends Exception>
+            CloseIt1<E1> rethrow(CloseIt1<? extends E1> closeIt, Consumer<? super Throwable> exConsumer) {
+        Objects.requireNonNull(closeIt, "closeIt required");
+        Objects.requireNonNull(exConsumer, "exConsumer required");
+        return () -> {
+            try {
+                closeIt.close();
+            } catch (Throwable th) {
+                exConsumer.accept(th);
+                throw th;
+            }
+        };
+    }
+    
 }
 /*
 BSD 2-Clause License

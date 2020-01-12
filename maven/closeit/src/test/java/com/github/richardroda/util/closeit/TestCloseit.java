@@ -203,8 +203,9 @@ public class TestCloseit extends BaseTest {
         }
     }
     
+    @Override
      protected void close() {
-        isClosed = true;
+        super.close();
         closeMethodsCalled.add(CloseMethodsTested.CLOSE);
     }
     protected void close1() throws CloneNotSupportedException {

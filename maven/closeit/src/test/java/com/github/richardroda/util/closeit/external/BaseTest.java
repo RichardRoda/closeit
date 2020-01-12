@@ -35,19 +35,22 @@ public class BaseTest {
         Assert.assertTrue(isClosed);
     }
     
-    public void closeThrowChecked() throws CloneNotSupportedException {
+    protected void closeThrowChecked() throws CloneNotSupportedException {
         isClosed = true;
         throw new CloneNotSupportedException();
     }
 
-    public void closeThrowError() throws AssertionError {
+    protected void closeThrowError() throws AssertionError {
         isClosed = true;
         throw new AssertionError();
     }
 
-    public void closeThrowUnChecked() throws ArithmeticException {
+    protected void closeThrowUnChecked() throws ArithmeticException {
         isClosed = true;
         throw new ArithmeticException();
     }
     
+    protected void close() {
+        isClosed = true;
+    }
 }
