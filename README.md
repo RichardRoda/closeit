@@ -6,12 +6,12 @@ This project is available from Maven Central Repository.  To use it, add the fol
 <dependency>
     <groupId>com.github.richardroda.util</groupId>
     <artifactId>closeit</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 </dependency>
 ```
 Use this dependency for Gradle
 
-	compile "com.github.richardroda.util:closeit:1.4"
+	compile "com.github.richardroda.util:closeit:1.5"
 
 Java 7 introduced a useful feature known as the `try-with-resources` construct. In order to take advantage of it, a class must implement `AutoCloseable`. However, there are classes that could benefit from this interface that do not implement it. Two examples are `Context` and `ExecutorService`. Although `AutoCloseable` is a functional interface because it implements exactly 1 abstract method, it is often not what is needed as a lambda target because `AutoCloseable::close` throws `Exception`. 
 
@@ -201,6 +201,39 @@ public void hideException(Context ctx) {
         doSomethingWithContext(ctx);
     }
 }
+```
+**Example 11: Process and Throw Close Exceptions**
+
+This example shows how to process a close exception with a `Consumer`, and then have it re-thrown.  Unlike the previous examples, this is available on all of the CloseIt interfaces (`CloseIt0` - `CloseIt5`).
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+public void rethrowException(Context ctx) throws NamingException {
+try (CloseIt1<NamingException> it = CloseIt1.rethrow(ctx::close, 
+        ex->logger.warning("Error closing context " + ex))) {
+    doSomethingWithContext(ctx);
+    }
+}
+```
+
+**Example 12: Process and Conditionally Throw Close Exceptions**
+
+This example shows how to process a close exception with a `Predicate`, and then have it conditionally re-thrown when the predicate returns `true`.  Unlike the previous examples, this is available on all of the CloseIt interfaces (`CloseIt0` - `CloseIt5`).  In this example, after logging, the exception is rethrown if it is a `CommunicationException` or a `ServiceUnavailableException`.
+
+```java
+import com.github.richardroda.util.closeit.*;
+...
+    public void rethrowExceptionWhen(Context ctx) throws NamingException {
+    try (CloseIt1<NamingException> it = CloseIt1.rethrowWhen(ctx::close, 
+            ex->{
+                logger.warning("Error closing context " + ex);
+                return ex instanceof CommunicationException 
+                        || ex instanceof ServiceUnavailableException;
+            })) {
+        doSomethingWithContext(ctx);
+        }
+    }
 ```
 
 
