@@ -7,7 +7,13 @@ import java.util.function.Predicate;
 /**
  * Functional Interface to allow try-with-resources to be used with any lambda
  * expression that throws five checked exceptions.
- *
+ * 
+ * @param <E1> Checked exception thrown by the close method.
+ * @param <E2> Checked exception thrown by the close method.
+ * @param <E3> Checked exception thrown by the close method.
+ * @param <E4> Checked exception thrown by the close method.
+ * @param <E5> Checked exception thrown by the close method.
+ * 
  * @author Richard Roda
  */
 @FunctionalInterface
@@ -21,34 +27,38 @@ public interface CloseIt5<E1 extends Exception, E2 extends Exception, E3 extends
     void closeIt() throws E1, E2, E3, E4, E5;
 
     /**
-     * Decorate the lambda with one that processes any {@link Throwable} with a
-     * predicate. The exception is rethrown when the {@code when} predicate
-     * returns {@code true}, otherwise it is not rethrown and effectively
-     * ignored. If the exception should always be rethrown, use
+     * Decorate the lambda with one that processes any {@link Throwable} exception 
+     * that is thrown when the {@link #close()} method is called with a
+     * predicate and rethrows the exception when the predicate is {@code true}.  If the 
+     * exception should always be rethrown, use
      * {@link #rethrow(com.github.richardroda.util.closeit.CloseIt5, java.util.function.Consumer) }.
      * If the exception should never be rethrown, use {@link CloseIt0#consumeAllThrowable(java.lang.AutoCloseable, java.util.function.Consumer)
-     * }.
+     * } or {@link CloseIt0#ignoreAllThrowable(java.lang.AutoCloseable) }.
      *
      * @return A decorated lambda that processes any {@link Throwable} that
      * occurs with a predicate that causes the exception to be rethrown when it
      * returns {@code true}, and ignored otherwise.
-     * @param <E1> Checked Exception Type
-     * @param <E2> Checked Exception Type
-     * @param <E3> Checked Exception Type
-     * @param <E4> Checked Exception Type
-     * @param <E5> Checked Exception Type
+     * @param <E1> Checked exception thrown by the close method.
+     * @param <E2> Checked exception thrown by the close method.
+     * @param <E3> Checked exception thrown by the close method.
+     * @param <E4> Checked exception thrown by the close method.
+     * @param <E5> Checked exception thrown by the close method.
      * @param closeIt The closeIt lambda. Must not be {@code null}.
      * @param when Predicate to process exceptions. Must not be {@code null}.
      * Exception is rethrown when {@code true} is returned, and ignored
-     * otherwise.
+     * otherwise.  It is acceptable for the predicate to have side effects
+     * like those typically found in a {@link java.util.function.Consumer}.
      * @see #rethrow(com.github.richardroda.util.closeit.CloseIt5,
      * java.util.function.Consumer)
-     * @see CloseIt0#consumeAllThrowable(java.lang.AutoCloseable,
+     * @see com.github.richardroda.util.closeit.CloseIt0#consumeAllThrowable(java.lang.AutoCloseable,
      * java.util.function.Consumer)
-     * @see CloseIt0#consumeAllException(java.lang.AutoCloseable,
+     * @see com.github.richardroda.util.closeit.CloseIt0#consumeAllException(java.lang.AutoCloseable,
      * java.util.function.Consumer)
-     * @see CloseIt0#consumeException(java.lang.AutoCloseable,
+     * @see com.github.richardroda.util.closeit.CloseIt0#consumeException(java.lang.AutoCloseable,
      * java.util.function.Consumer)
+     * @see com.github.richardroda.util.closeit.CloseIt0#ignoreAllThrowable(java.lang.AutoCloseable) 
+     * @see com.github.richardroda.util.closeit.CloseIt0#ignoreAllException(java.lang.AutoCloseable) 
+     * @see com.github.richardroda.util.closeit.CloseIt0#ignoreException(java.lang.AutoCloseable) 
      */
     static <E1 extends Exception, E2 extends Exception, E3 extends Exception, E4 extends Exception, E5 extends Exception>
             CloseIt5<E1, E2, E3, E4, E5> rethrowWhen(CloseIt5<? extends E1, ? extends E2, ? extends E3, ? extends E4, ? extends E5> closeIt, Predicate<? super Throwable> when) {
@@ -66,16 +76,17 @@ public interface CloseIt5<E1 extends Exception, E2 extends Exception, E3 extends
     }
 
     /**
-     * Decorate the lambda with one that processes any {@link Throwable} with a
-     * consumer and then rethrows it.
+     * Decorate the lambda with one that processes any {@link Throwable} exception 
+     * that is thrown when the {@link #close()} method is called with a
+     * consumer and rethrows the exception.
      *
      * @return A decorated lambda that processes any {@link Throwable} that
      * occurs with a consumer and then rethrows it.
-     * @param <E1> Checked Exception Type
-     * @param <E2> Checked Exception Type
-     * @param <E3> Checked Exception Type
-     * @param <E4> Checked Exception Type
-     * @param <E5> Checked Exception Type
+     * @param <E1> Checked exception thrown by the close method.
+     * @param <E2> Checked exception thrown by the close method.
+     * @param <E3> Checked exception thrown by the close method.
+     * @param <E4> Checked exception thrown by the close method.
+     * @param <E5> Checked exception thrown by the close method.
      * @param closeIt The closeIt lambda. Must not be {@code null}.
      * @param exConsumer Consumer to process exceptions. Must not be
      * {@code null}.

@@ -13,9 +13,9 @@ package com.github.richardroda.util.closeit;
  * with this exception and the other exceptions that need to be handled.
  * 
  * @author Richard Roda
- * @see CloseIt0#wrapException(java.lang.AutoCloseable) 
- * @see CloseIt0#wrapAllException(java.lang.AutoCloseable) 
- * @see CloseIt0#wrapAllThrowable(java.lang.AutoCloseable) 
+ * @see com.github.richardroda.util.closeit.CloseIt0#wrapException(java.lang.AutoCloseable) 
+ * @see com.github.richardroda.util.closeit.CloseIt0#wrapAllException(java.lang.AutoCloseable) 
+ * @see com.github.richardroda.util.closeit.CloseIt0#wrapAllThrowable(java.lang.AutoCloseable) 
  */
 public final class NotClosedException extends IllegalStateException {
 

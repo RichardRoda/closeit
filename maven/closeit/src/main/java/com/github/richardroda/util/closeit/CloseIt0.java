@@ -40,7 +40,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which wraps any checked exceptions in
      * a {@code NotClosedException}.
      * @see #toCloseIt0(java.lang.AutoCloseable, java.util.function.Function)
-     * @see CloseIt0#wrapException(java.lang.AutoCloseable, java.util.function.Function) 
+     * @see com.github.richardroda.util.closeit.CloseIt1#wrapException(java.lang.AutoCloseable, java.util.function.Function) 
      */
     public static CloseIt0 wrapException(AutoCloseable autoCloseable) {
         return toCloseIt0(autoCloseable, NotClosedException::new);
@@ -54,7 +54,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which wraps all exceptions in
      * a {@code NotClosedException}.
      * @see #toCloseIt0AllException(java.lang.AutoCloseable, java.util.function.Function) 
-     * @see CloseIt0#wrapAllException(java.lang.AutoCloseable, java.util.function.Function) 
+     * @see com.github.richardroda.util.closeit.CloseIt1#wrapAllException(java.lang.AutoCloseable, java.util.function.Function) 
      */
     public static CloseIt0 wrapAllException(AutoCloseable autoCloseable) {
         return toCloseIt0AllException(autoCloseable, NotClosedException::new);
@@ -68,7 +68,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which wraps all {@link Throwable} in
      * a {@code NotClosedException}.
      * @see #toCloseIt0AllThrowable(java.lang.AutoCloseable, java.util.function.Function) 
-     * @see CloseIt0#wrapAllThrowable(java.lang.AutoCloseable, java.util.function.Function) 
+     * @see com.github.richardroda.util.closeit.CloseIt1#wrapAllThrowable(java.lang.AutoCloseable, java.util.function.Function) 
      */
     public static CloseIt0 wrapAllThrowable(AutoCloseable autoCloseable) {
         return toCloseIt0AllThrowable(autoCloseable, NotClosedException::new);
@@ -292,13 +292,13 @@ public interface CloseIt0 extends AutoCloseable {
 
     
     /**
-     * Decorate the lambda with one that processes any {@link Throwable} with a
-     * predicate. The exception is rethrown when the {@code when} predicate
-     * returns {@code true}, otherwise it is not rethrown and effectively
-     * ignored. If the exception should always be rethrown, use
+     * Decorate the lambda with one that processes any {@link Throwable} exception 
+     * that is thrown when the {@link #close()} method is called with a
+     * predicate and rethrows the exception when the predicate is {@code true}.  If the 
+     * exception should always be rethrown, use
      * {@link #rethrow(com.github.richardroda.util.closeit.CloseIt0, java.util.function.Consumer) }.
      * If the exception should never be rethrown, use {@link CloseIt0#consumeAllThrowable(java.lang.AutoCloseable, java.util.function.Consumer)
-     * }.
+     * } or {@link CloseIt0#ignoreAllThrowable(java.lang.AutoCloseable) }.
      *
      * @return A decorated lambda that processes any {@link Throwable} that
      * occurs with a predicate that causes the exception to be rethrown when it
@@ -306,15 +306,19 @@ public interface CloseIt0 extends AutoCloseable {
      * @param closeIt The closeIt lambda. Must not be {@code null}.
      * @param when Predicate to process exceptions. Must not be {@code null}.
      * Exception is rethrown when {@code true} is returned, and ignored
-     * otherwise.
+     * otherwise.  It is acceptable for the predicate to have side effects
+     * like those typically found in a {@link java.util.function.Consumer}.
      * @see #rethrow(com.github.richardroda.util.closeit.CloseIt0,
      * java.util.function.Consumer)
-     * @see CloseIt0#consumeAllThrowable(java.lang.AutoCloseable,
+     * @see com.github.richardroda.util.closeit.CloseIt0#consumeAllThrowable(java.lang.AutoCloseable,
      * java.util.function.Consumer)
-     * @see CloseIt0#consumeAllException(java.lang.AutoCloseable,
+     * @see com.github.richardroda.util.closeit.CloseIt0#consumeAllException(java.lang.AutoCloseable,
      * java.util.function.Consumer)
-     * @see CloseIt0#consumeException(java.lang.AutoCloseable,
+     * @see com.github.richardroda.util.closeit.CloseIt0#consumeException(java.lang.AutoCloseable,
      * java.util.function.Consumer)
+     * @see com.github.richardroda.util.closeit.CloseIt0#ignoreAllThrowable(java.lang.AutoCloseable) 
+     * @see com.github.richardroda.util.closeit.CloseIt0#ignoreAllException(java.lang.AutoCloseable) 
+     * @see com.github.richardroda.util.closeit.CloseIt0#ignoreException(java.lang.AutoCloseable) 
      */
     static CloseIt0 rethrowWhen(CloseIt0 closeIt, Predicate<? super Throwable> when) {
         Objects.requireNonNull(closeIt, "closeIt required");
@@ -331,16 +335,15 @@ public interface CloseIt0 extends AutoCloseable {
     }
 
     /**
-     * Decorate the lambda with one that processes any {@link Throwable} with a
-     * consumer and then rethrows it.
+     * Decorate the lambda with one that processes any {@link Throwable} exception 
+     * that is thrown when the {@link #close()} method is called with a
+     * consumer and rethrows the exception.
      *
      * @return A decorated lambda that processes any {@link Throwable} that
      * occurs with a consumer and then rethrows it.
      * @param closeIt The closeIt lambda. Must not be {@code null}.
      * @param exConsumer Consumer to process exceptions. Must not be
      * {@code null}.
-     * @throws E1 Checked exception type which is always rethrown.
-     * @throws E2 Checked exception type which is always rethrown.
      * @see #rethrowWhen(com.github.richardroda.util.closeit.CloseIt0, java.util.function.Predicate) 
      */
     static CloseIt0 rethrow(CloseIt0 closeIt, Consumer<? super Throwable> exConsumer) {
