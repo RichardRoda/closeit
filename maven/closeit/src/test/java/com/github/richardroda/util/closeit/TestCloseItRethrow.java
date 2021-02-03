@@ -174,23 +174,23 @@ public class TestCloseItRethrow extends BaseTest {
         return lambda;
     }
     
-    protected static Function<TestCloseItRethrow,CloseIt2<CloneNotSupportedException, InstantiationException>> 
-        t2(Function<TestCloseItRethrow,CloseIt2<CloneNotSupportedException, InstantiationException>> lambda) {
+    protected static Function<TestCloseItRethrow,CloseIt2<? super CloneNotSupportedException, ? super InstantiationException>>
+        t2(Function<TestCloseItRethrow,CloseIt2<? super CloneNotSupportedException, ? super InstantiationException>> lambda) {
         return lambda;
     }
     
-    protected static Function<TestCloseItRethrow,CloseIt3<CloneNotSupportedException, InstantiationException, InterruptedException>> 
-        t3(Function<TestCloseItRethrow,CloseIt3<CloneNotSupportedException, InstantiationException, InterruptedException>> lambda) {
+    protected static Function<TestCloseItRethrow,CloseIt3<? super CloneNotSupportedException, ? super InstantiationException, ? super InterruptedException>>
+        t3(Function<TestCloseItRethrow,CloseIt3<? super CloneNotSupportedException, ? super InstantiationException, ? super InterruptedException>> lambda) {
         return lambda;
     }
     
-    protected static Function<TestCloseItRethrow,CloseIt4<CloneNotSupportedException, InstantiationException, InterruptedException, NoSuchFieldException>> 
-        t4(Function<TestCloseItRethrow,CloseIt4<CloneNotSupportedException, InstantiationException, InterruptedException, NoSuchFieldException>> lambda) {
+    protected static Function<TestCloseItRethrow,CloseIt4<? super CloneNotSupportedException, ? super InstantiationException, ? super InterruptedException, ? super NoSuchFieldException>>
+        t4(Function<TestCloseItRethrow,CloseIt4<? super CloneNotSupportedException, ? super InstantiationException, ? super InterruptedException, ? super NoSuchFieldException>> lambda) {
         return lambda;
     }
     
-    protected static Function<TestCloseItRethrow,CloseIt5<CloneNotSupportedException, InstantiationException, InterruptedException, NoSuchFieldException, NoSuchMethodException>> 
-        t5(Function<TestCloseItRethrow,CloseIt5<CloneNotSupportedException, InstantiationException, InterruptedException, NoSuchFieldException, NoSuchMethodException>> lambda) {
+    protected static Function<TestCloseItRethrow,CloseIt5<? super CloneNotSupportedException, ? super InstantiationException, ? super InterruptedException, ? super NoSuchFieldException, ? super NoSuchMethodException>>
+        t5(Function<TestCloseItRethrow,CloseIt5<? super CloneNotSupportedException, ? super InstantiationException, ? super InterruptedException, ? super NoSuchFieldException, ? super NoSuchMethodException>> lambda) {
         return lambda;
     }
 }

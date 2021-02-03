@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.richardroda.util</groupId>
     <artifactId>closeit</artifactId>
-    <version>1.5</version>
+    <version>1.5-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>
         Functional interfaces that facilitate using try-with-resources with
@@ -15,129 +16,149 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <licenses>
-      <license>
-        <name>BSD-2-Clause</name>
-        <url>https://raw.githubusercontent.com/RichardRoda/closeit/master/LICENSE</url>
-      </license>
+        <license>
+            <name>BSD-2-Clause</name>
+            <url>https://raw.githubusercontent.com/RichardRoda/closeit/master/LICENSE</url>
+        </license>
     </licenses>
     <developers>
         <developer>
-          <name>Richard Roda</name>
-          <email>richard_roda@hotmail.com</email>
-          <organization>Personal</organization>
-          <organizationUrl>https://github.com/RichardRoda</organizationUrl>
-          <id>RichardRoda</id>
+            <name>Richard Roda</name>
+            <email>richard_roda@hotmail.com</email>
+            <organization>Personal</organization>
+            <organizationUrl>https://github.com/RichardRoda</organizationUrl>
+            <id>RichardRoda</id>
         </developer>
     </developers>
     <scm>
-      <connection>scm:git:git://github.com/RichardRoda/closeit.git</connection>
-      <developerConnection>scm:git:ssh://github.com/RichardRoda/closeit.git</developerConnection>
-      <url>https://github.com/RichardRoda/closeit.git/tree/master</url>
+        <connection>scm:git:git://github.com/RichardRoda/closeit.git</connection>
+        <developerConnection>scm:git:ssh://github.com/RichardRoda/closeit.git</developerConnection>
+        <url>https://github.com/RichardRoda/closeit.git/tree/master</url>
     </scm>
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/RichardRoda/closeit/issues</url>
     </issueManagement>
     <dependencies>
-    <dependency>
-        <groupId>org.testng</groupId>
-        <artifactId>testng</artifactId>
-        <version>6.13.1</version>
-        <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.13.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-<build>
-    <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.0.2</version>
-          <configuration>
-            <archive>
-            <!-- For integration using Java 9 automatic modules.  Give a stable
-                 module name of com.github.richardroda.util.closeit instead of the
-                 name of the jarfile. -->
-              <manifestEntries>
-                <Automatic-Module-Name>${project.groupId}.${project.artifactId}</Automatic-Module-Name>
-              </manifestEntries>
-            </archive>
-          </configuration>
-        </plugin>        
-    </plugins>
-</build>
-<profiles>
-  <profile> 
-    <id>release</id>
     <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.0.0</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-gpg-plugin</artifactId>
-              <version>1.5</version>
-              <executions>
-                <execution>
-                  <id>sign-artifacts</id>
-                  <phase>verify</phase>
-                  <goals>
-                    <goal>sign</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <executions>
+                    <!-- citation https://maven.apache.org/plugins/maven-compiler-plugin/examples/module-info.html -->
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <!-- compile everything to ensure module-info contains right entries -->
+                            <release>9</release>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jdk8-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <!-- recompile everything for target VM except the module-info.java.
+                             overwrites result of previous operation -->
+                        <configuration>
+                            <excludes>
+                                <exclude>module-info.java</exclude>
+                            </excludes>
+                            <release>8</release>
+                        </configuration>
+                    </execution>
+                </executions>
+                <!-- Set the defaults for the unit testing to Java 8.  For unit testing Java 11,
+                     we are setting up a separate maven project whose sole purpose is to verify
+                     that the correct libraries are required and exported, and that the code runs with those
+                     libraries under JDK 11.  The unit test is targeting JDK 11 not 9 because JDK 11
+                     is the long term release that includes the module feature. -->
+                <configuration>
+                    <release>8</release>
+                </configuration>
             </plugin>
-            <plugin>
-              <groupId>org.sonatype.plugins</groupId>
-              <artifactId>nexus-staging-maven-plugin</artifactId>
-              <version>1.6.8</version>
-              <extensions>true</extensions>
-              <configuration>
-                 <serverId>ossrh</serverId>
-                 <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                 <autoReleaseAfterClose>true</autoReleaseAfterClose>
-              </configuration>
-            </plugin>
-        </plugins>    
+        </plugins>
     </build>
-    <distributionManagement>
-      <snapshotRepository>
-        <id>ossrh</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      </snapshotRepository>
-      <repository>
-        <id>ossrh</id>
-        <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-      </repository>
-    </distributionManagement>
-  </profile>
-    
-</profiles>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+
+    </profiles>
 </project>
