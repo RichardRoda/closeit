@@ -6,12 +6,14 @@ This project is available from Maven Central Repository.  To use it, add the fol
 <dependency>
     <groupId>com.github.richardroda.util</groupId>
     <artifactId>closeit</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 </dependency>
 ```
 Use this dependency for Gradle
 
-	compile "com.github.richardroda.util:closeit:1.5"
+	compile "com.github.richardroda.util:closeit:1.6"
+
+This project provides module info to support Java 9+ modules and is binary compatible with Java 8.  Java 9+ projects using this as a module should put `requires com.github.richardroda.util.closeit;` in their module declaration to enable usage of this library.
 
 Java 7 introduced a useful feature known as the `try-with-resources` construct. In order to take advantage of it, a class must implement `AutoCloseable`. However, there are classes that could benefit from this interface that do not implement it. Two examples are `Context` and `ExecutorService`. Although `AutoCloseable` is a functional interface because it implements exactly 1 abstract method, it is often not what is needed as a lambda target because `AutoCloseable::close` throws `Exception`. 
 
