@@ -237,7 +237,43 @@ import com.github.richardroda.util.closeit.*;
         }
     }
 ```
+**Example 13: Combine rethrow and rethrowWhen with checked exception processing**
 
+The `CloseIt1.rethrow` and `CloseIt1.rethrowWhen` methods can be combined with the following `CloseIt0` methods that deal with checked exceptions: `wrapException`, `wrapAllException`, `wrapAllThrowable`, and `hideException`.  A two layered decorator may be produced that combines the functionality of both.  To wrap any checked exceptions that occurred in Example 12, the code could be written like this:
+```java
+    public void rethrowExceptionWhen(Context ctx) {
+        try (CloseIt0 it = CloseIt0.wrapException(CloseIt1.rethrowWhen(ctx::close,
+                ex->{
+                    logger.warning("Error closing context " + ex);
+                    return ex instanceof CommunicationException
+                            || ex instanceof ServiceUnavailableException;
+                }))) {
+            doSomethingWithContext(ctx);
+        }
+    }
+```
+
+To perform the `rethrow` processing in example 11 and hide the exception from the compiler, the code could be written like this
+```java
+    public void rethrowException(Context ctx)  {
+        try (CloseIt0 it = CloseIt0.hideException(CloseIt1.rethrow(ctx::close,
+                ex->logger.warning("Error closing context " + ex)))) {
+            doSomethingWithContext(ctx);
+        }
+    }
+```
+
+When combining `CloseIt1` rethrow methods with `CloseIt0` checked exception processing, `CloseIt0` should work with any closable expression regardless of how many checked exceptions are thrown.  In the event that this isn't the case and an exception related error does occur, the `CloseIt1` method may be called explicitly with `Exception` as the parameter type to resolve it.
+```java
+    public void rethrowException(Context ctx)  {
+        // Force the compiler to use CloseIt1<Exception> for the rethrow call.
+        // This resolves any errors related to checked exceptions.
+        try (CloseIt0 it = CloseIt0.hideException(CloseIt1.<Exception>rethrow(ctx::close,
+                ex->logger.warning("Error closing context " + ex)))) {
+            doSomethingWithContext(ctx);
+        }
+    }
+```
 
 ## CloseIt as a finally replacement ##
 
@@ -245,7 +281,7 @@ The CloseIt interfaces with a lambda expression may be used instead of a `try-fi
 
 The above issues of exception hiding and execution interference can exist with *any* finally block, not just resource blocks.  Any method called within a finally block may throw an exception or error.  The lack of a `throws` clause is no guarantee that a `RuntimeException` will not be thrown by a given method call.  For this reason, a project may consider replacing `finally` blocks with `try-with-resources` lambdas.  Here is an example of code that has finally clause issues.
 
-**Example 11: Problematic Finally block**
+**Example 14: Problematic Finally block**
 ```java
 public void useContextAndExecutorService(Context ctx, ExecutorService es) throws NamingException, InterruptedException {
     try {
@@ -260,7 +296,7 @@ public void useContextAndExecutorService(Context ctx, ExecutorService es) throws
 There are issues with these 7 lines of code.  If the call to `shutdown` or `awaitTermination` throws an exception, `close` is never called on the context.  Also, any exception in the `finally` block will discard an exception from the `try` block.  We want to cleanup all all resources, and suppress any exceptions that occur in the `finally` clause while throwing the original exception.
 
 
-**Example 12: Rewrite using CloseIt**
+**Example 15: Rewrite using CloseIt**
 ```java  
 import com.github.richardroda.util.closeit.*;
 ...
