@@ -239,7 +239,7 @@ import com.github.richardroda.util.closeit.*;
 ```
 **Example 13: Combine rethrow and rethrowWhen with checked exception processing**
 
-The `CloseIt1.rethrow` and `CloseIt1.rethrowWhen` methods can be combined with the following `CloseIt0` methods that deal with checked exceptions: `wrapException`, `wrapAllException`, `wrapAllThrowable`, and `hideException`.  A two layered decorator may be produced that combines the functionality of both.  To wrap any checked exceptions that occurred in Example 12, the code could be written like this:
+The `CloseIt1.rethrow` and `CloseIt1.rethrowWhen` methods can be combined with the following `CloseIt0` methods that deal with checked exceptions: `wrapException`, `wrapAllException`, `wrapAllThrowable`, and `hideException`.  A two layered decorator may be produced that combines the functionality of both.  To wrap the `CommunicationException` and `ServiceUnavailableException` checked exceptions that occur in Example 12, the code could be written like this:
 ```java
     public void rethrowExceptionWhen(Context ctx) {
         try (CloseIt0 it = CloseIt0.wrapException(CloseIt1.rethrowWhen(ctx::close,
@@ -248,7 +248,7 @@ The `CloseIt1.rethrow` and `CloseIt1.rethrowWhen` methods can be combined with t
                     return ex instanceof CommunicationException
                             || ex instanceof ServiceUnavailableException;
                 }))) {
-            doSomethingWithContext(ctx);
+            doSomethingWithContext(ctx); // Throws no checked exceptions.
         }
     }
 ```
@@ -258,21 +258,25 @@ To perform the `rethrow` processing in example 11 and hide the exception from th
     public void rethrowException(Context ctx)  {
         try (CloseIt0 it = CloseIt0.hideException(CloseIt1.rethrow(ctx::close,
                 ex->logger.warning("Error closing context " + ex)))) {
-            doSomethingWithContext(ctx);
+            doSomethingWithContext(ctx); // Throws no checked exceptions.
         }
     }
 ```
 
-When combining `CloseIt1` rethrow methods with `CloseIt0` checked exception processing, `CloseIt0` should work with any closable expression regardless of how many checked exceptions are thrown.  In the event that this isn't the case and an exception related error does occur, the `CloseIt1` method may be called explicitly with `Exception` as the parameter type to resolve it.
+When combining `CloseIt1` rethrow methods with `CloseIt0` checked exception processing, `CloseIt1` should work with any closable expression regardless of how many and what kinds of checked exceptions are thrown.  If an exception related error occurs, the `CloseIt1` method may be called explicitly with `Exception` as the parameter type to resolve it.  This example also shows how to combine the error handling of `CloseIt1.rethrow` or `CloseIt1.rethrowWhen` methods with catching the `NotClosedException` provided by `CloseIt0.wrapException`, `CloseIt0.wrapAllException`, or `CloseIt0.wrapAllThrowable`.
 ```java
-    public void rethrowException(Context ctx)  {
-        // Force the compiler to use CloseIt1<Exception> for the rethrow call.
-        // This resolves any errors related to checked exceptions.
-        try (CloseIt0 it = CloseIt0.hideException(CloseIt1.<Exception>rethrow(ctx::close,
-                ex->logger.warning("Error closing context " + ex)))) {
-            doSomethingWithContext(ctx);
-        }
+public void rethrowException(Context ctx) {
+    // Force the compiler to use CloseIt1<Exception> for the rethrow call.
+    // This resolves errors caused by checked exception ambiguity.
+    try(CloseIt0 it=CloseIt0.wrapAllException(CloseIt1.<Exception>rethrow(ctx::close,
+            ex->logger.warning("Error closing context "+ex)))){
+        doSomethingWithContext(ctx); // Throws no checked exceptions.
+    } catch(NotClosedException ex) {
+        // Combine the error handling of rethrow with the catching
+        // of the NotClosedException provided by wrapAllException
+        processNotClosedException(ex);
     }
+}
 ```
 
 ## CloseIt as a finally replacement ##
