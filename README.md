@@ -18,6 +18,7 @@ This project provides module info to support Java 9+ modules and is binary compa
 Java 7 introduced a useful feature known as the `try-with-resources` construct. In order to take advantage of it, a class must implement `AutoCloseable`. However, there are classes that could benefit from this interface that do not implement it. Two examples are `Context` and `ExecutorService`. Although `AutoCloseable` is a functional interface because it implements exactly 1 abstract method, it is often not what is needed as a lambda target because `AutoCloseable::close` throws `Exception`. 
 
 **Example 1: Close a Context With AutoCloseable**
+
 ```java  
 public void useContext(Context ctx) throws Exception {
     try(AutoCloseable it = ctx::close) {
@@ -29,6 +30,7 @@ public void useContext(Context ctx) throws Exception {
 The CloseIt interfaces provide a series of generic interfaces that are parameterized with the checked exceptions thrown by the lambda. The CloseIt interfaces may be conceptually viewed as an interface named "CloseIt" followed by a number from 0-5 specifying how many checked exceptions are specified as generic class arguments. So, if you lambda throws no checked exceptions, `CloseIt0` is used. If it throws one checked exception, `CloseIt1` is used. Up to five (`CloseIt5`) checked exceptions may be supported in this manner.
 
 **Example 2: Close a Context with CloseIt**
+
 ```java  
 import com.github.richardroda.util.closeit.*;
 ...
@@ -38,6 +40,9 @@ public void useContext(Context ctx) throws NamingException {
     }
 }
 ```
+
+**Example 3: Create a Higher Order Function to Use a Context **
+
 Alternatively, this could be written as a higher order function using the [loan pattern](https://blog.knoldus.com/scalaknol-understanding-loan-pattern/) (a form of the [execute around](https://java-design-patterns.com/patterns/execute-around/) pattern specialized for resources).
 ```java
 import com.github.richardroda.util.closeit.*;
@@ -60,17 +65,6 @@ useContext(ctx->doSomethingWithContext(ctx));
 ```
 The advantages of the loan pattern are the usages are concise, and other concerns, such as usage logging, can be centralized into the higher order loan fuction.
 
-**Example 3: Shutdown an ExecutorService with CloseIt**
-```java    
-import com.github.richardroda.util.closeit.*;
-...
-public void useExecutorService() {
-    ExecutorService es = Executors.newSingleThreadExecutor();
-    try(CloseIt0 it = es::shutdown) {
-        doSomethingWithExecutorService(es);
-    }
-}
-```
 **Example 4: Close Multiple Nested - LDAP Search**
 
 This example shows how to define multiple `CloseIt` lambdas in a single `try-with-resources` construct, when an outer resource must be closed when the creation of an inner resource fails.
