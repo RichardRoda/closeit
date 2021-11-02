@@ -27,6 +27,7 @@ public void useContext(Context ctx) throws Exception {
 ```
 
 The CloseIt interfaces provide a series of generic interfaces that are parameterized with the checked exceptions thrown by the lambda. The CloseIt interfaces may be conceptually viewed as an interface named "CloseIt" followed by a number from 0-5 specifying how many checked exceptions are specified as generic class arguments. So, if you lambda throws no checked exceptions, `CloseIt0` is used. If it throws one checked exception, `CloseIt1` is used. Up to five (`CloseIt5`) checked exceptions may be supported in this manner.
+
 **Example 2: Close a Context with CloseIt**
 ```java  
 import com.github.richardroda.util.closeit.*;
