@@ -41,7 +41,7 @@ public void useContext(Context ctx) throws NamingException {
 }
 ```
 
-**Example 3: Create a Higher Order Function to Use a Context **
+**Example 3: Create a Higher Order Function to Use a Context**
 
 Alternatively, this could be written as a higher order function using the [loan pattern](https://blog.knoldus.com/scalaknol-understanding-loan-pattern/) (a form of the [execute around](https://java-design-patterns.com/patterns/execute-around/) pattern specialized for resources).
 ```java
