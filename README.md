@@ -27,8 +27,39 @@ public void useContext(Context ctx) throws Exception {
 ```
 
 The CloseIt interfaces provide a series of generic interfaces that are parameterized with the checked exceptions thrown by the lambda. The CloseIt interfaces may be conceptually viewed as an interface named "CloseIt" followed by a number from 0-5 specifying how many checked exceptions are specified as generic class arguments. So, if you lambda throws no checked exceptions, `CloseIt0` is used. If it throws one checked exception, `CloseIt1` is used. Up to five (`CloseIt5`) checked exceptions may be supported in this manner.
+**Example 2: Close a Context with CloseIt**
+```java  
+import com.github.richardroda.util.closeit.*;
+...
+public void useContext(Context ctx) throws NamingException {
+    try(CloseIt1<NamingException> it = ctx::close) {
+        doSomethingWithContext(ctx);
+    }
+}
+```
+Alternatively, this could be written as a higher order function using the [loan pattern](https://blog.knoldus.com/scalaknol-understanding-loan-pattern/) (a form of the [execute around](https://java-design-patterns.com/patterns/execute-around/) pattern specialized for resources).
+```java
+import com.github.richardroda.util.closeit.*;
+...
+@FunctionalInterface
+public interface ContextFunction<T> {
+    T apply(Context ctx) throws NamingException;
+}
+...
+public <T> T useContext(ContextFunction<? extends T> action) throws NamingException {
+    Context ctx = getContext();
+    try(CloseIt1<NamingException> it = ctx::close) {
+        return action.apply(ctx);
+    }
+}
+```
+The useContext method above can then be used like this:
+```java
+useContext(ctx->doSomethingWithContext(ctx));
+```
+The advantages of the loan pattern are the usages are concise, and other concerns, such as usage logging, can be centralized into the higher order loan fuction.
 
-**Example 2: Shutdown an ExecutorService with CloseIt**
+**Example 3: Shutdown an ExecutorService with CloseIt**
 ```java    
 import com.github.richardroda.util.closeit.*;
 ...
@@ -36,16 +67,6 @@ public void useExecutorService() {
     ExecutorService es = Executors.newSingleThreadExecutor();
     try(CloseIt0 it = es::shutdown) {
         doSomethingWithExecutorService(es);
-    }
-}
-```
-**Example 3: Close a Context with CloseIt**
-```java  
-import com.github.richardroda.util.closeit.*;
-...
-public void useContext(Context ctx) throws NamingException {
-    try(CloseIt1<NamingException> it = ctx::close) {
-        doSomethingWithContext(ctx);
     }
 }
 ```
