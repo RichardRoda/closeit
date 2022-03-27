@@ -32,7 +32,7 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git://github.com/RichardRoda/closeit.git</connection>
+        <connection>scm:git:https://github.com/RichardRoda/closeit.git</connection>
         <developerConnection>scm:git:https://github.com/RichardRoda/closeit.git</developerConnection>
         <url>https://github.com/RichardRoda/closeit.git/tree/master</url>
       <tag>closeit-1.7</tag>
