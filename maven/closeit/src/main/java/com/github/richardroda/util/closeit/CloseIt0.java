@@ -17,7 +17,7 @@ import java.util.function.Predicate;
  * @author Richard Roda
  */
 @FunctionalInterface
-public interface CloseIt0 extends AutoCloseable {
+public interface CloseIt0 extends CloseIt1<RuntimeException> {
 
     /**
      * Close the underlying object.  May also be decorated (wrapped) with
@@ -30,7 +30,7 @@ public interface CloseIt0 extends AutoCloseable {
      * and any {@link Throwable} occurs.
      */
     @Override
-    public void close() throws NotClosedException;
+    void closeIt() throws NotClosedException;
 
     /**
      * Convert an {@link AutoCloseable} into a {@link CloseIt0} which throws
@@ -42,7 +42,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @see #toCloseIt0(java.lang.AutoCloseable, java.util.function.Function)
      * @see com.github.richardroda.util.closeit.CloseIt1#wrapException(java.lang.AutoCloseable, java.util.function.Function) 
      */
-    public static CloseIt0 wrapException(AutoCloseable autoCloseable) {
+    static CloseIt0 wrapException(AutoCloseable autoCloseable) {
         return toCloseIt0(autoCloseable, NotClosedException::new);
     }
 
@@ -56,7 +56,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @see #toCloseIt0AllException(java.lang.AutoCloseable, java.util.function.Function) 
      * @see com.github.richardroda.util.closeit.CloseIt1#wrapAllException(java.lang.AutoCloseable, java.util.function.Function) 
      */
-    public static CloseIt0 wrapAllException(AutoCloseable autoCloseable) {
+    static CloseIt0 wrapAllException(AutoCloseable autoCloseable) {
         return toCloseIt0AllException(autoCloseable, NotClosedException::new);
     }
 
@@ -70,7 +70,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @see #toCloseIt0AllThrowable(java.lang.AutoCloseable, java.util.function.Function) 
      * @see com.github.richardroda.util.closeit.CloseIt1#wrapAllThrowable(java.lang.AutoCloseable, java.util.function.Function) 
      */
-    public static CloseIt0 wrapAllThrowable(AutoCloseable autoCloseable) {
+    static CloseIt0 wrapAllThrowable(AutoCloseable autoCloseable) {
         return toCloseIt0AllThrowable(autoCloseable, NotClosedException::new);
     }
 
@@ -89,7 +89,7 @@ public interface CloseIt0 extends AutoCloseable {
      * compiler.
      * @see #toCloseIt0(java.lang.AutoCloseable, java.util.function.Function) 
      */
-    public static CloseIt0 hideException(AutoCloseable autoCloseable) {
+    static CloseIt0 hideException(AutoCloseable autoCloseable) {
         return toCloseIt0(autoCloseable, CloseItHelper::hideException);
     }
     
@@ -100,7 +100,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which ignores (does not rethrow) any checked
      * exception.
      */
-    public static CloseIt0 ignoreException(AutoCloseable autoCloseable) {
+    static CloseIt0 ignoreException(AutoCloseable autoCloseable) {
         return consumeException(autoCloseable, CloseItHelper::noOp);
     }
     
@@ -112,7 +112,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which consumes (does not rethrow) any checked
      * exception, but accepts them with the provided consumer.
      */
-    public static CloseIt0 consumeException(AutoCloseable autoCloseable
+    static CloseIt0 consumeException(AutoCloseable autoCloseable
         , Consumer<? super Exception> exConsumer) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exConsumer, "exConsumer required");
@@ -134,7 +134,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which ignores (does not rethrow) any
      * exception.
      */
-    public static CloseIt0 ignoreAllException(AutoCloseable autoCloseable) {
+    static CloseIt0 ignoreAllException(AutoCloseable autoCloseable) {
         return consumeAllException(autoCloseable, CloseItHelper::noOp);
     }
     
@@ -146,7 +146,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which consumes (does not rethrow) any
      * exception, but accepts them with the provided consumer.
      */
-    public static CloseIt0 consumeAllException(AutoCloseable autoCloseable
+    static CloseIt0 consumeAllException(AutoCloseable autoCloseable
         , Consumer<? super Exception> exConsumer) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exConsumer, "exConsumer required");
@@ -165,7 +165,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @param autoCloseable An autoCloseable object or lambda.
      * @return A {@code CloseIt0} which ignores (does not rethrow) any throwable.
      */
-    public static CloseIt0 ignoreAllThrowable(AutoCloseable autoCloseable) {
+    static CloseIt0 ignoreAllThrowable(AutoCloseable autoCloseable) {
         return consumeAllThrowable(autoCloseable, CloseItHelper::noOp);
     }
     
@@ -177,7 +177,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which consumes (does not rethrow) any throwable
      * exception, but accepts them with the provided consumer.
      */
-    public static CloseIt0 consumeAllThrowable(AutoCloseable autoCloseable
+    static CloseIt0 consumeAllThrowable(AutoCloseable autoCloseable
         , Consumer<? super Throwable> exConsumer) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exConsumer, "exConsumer required");
@@ -206,7 +206,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which uses an {@code exceptionMapper} to
      * map any checked exceptions to unchecked exceptions.
      */
-    public static CloseIt0 toCloseIt0(AutoCloseable autoCloseable,
+    static CloseIt0 toCloseIt0(AutoCloseable autoCloseable,
              Function<? super Exception, ? extends RuntimeException> exceptionMapper) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
@@ -241,7 +241,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which uses an {@code exceptionMapper} to
      * map all exceptions to an unchecked exception.
      */
-    public static CloseIt0 toCloseIt0AllException(AutoCloseable autoCloseable,
+    static CloseIt0 toCloseIt0AllException(AutoCloseable autoCloseable,
              Function<? super Exception, ? extends RuntimeException> exceptionMapper) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
@@ -273,7 +273,7 @@ public interface CloseIt0 extends AutoCloseable {
      * @return A {@code CloseIt0} which uses an {@code exceptionMapper} to
      * map all throwables to an unchecked exception.
      */
-    public static CloseIt0 toCloseIt0AllThrowable(AutoCloseable autoCloseable,
+    static CloseIt0 toCloseIt0AllThrowable(AutoCloseable autoCloseable,
              Function<? super Throwable, ? extends RuntimeException> exceptionMapper) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exceptionMapper, "exceptionMapper required");

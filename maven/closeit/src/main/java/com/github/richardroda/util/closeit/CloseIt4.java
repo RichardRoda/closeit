@@ -19,11 +19,7 @@ import java.util.function.Predicate;
 public interface CloseIt4<E1 extends Exception, 
         E2 extends Exception, 
         E3 extends Exception, 
-        E4 extends Exception> extends AutoCloseable {
-    @Override
-    default void close() throws E1, E2, E3, E4 {
-        closeIt();
-    }
+        E4 extends Exception> extends CloseIt5<E1, E2, E3, E4, RuntimeException> {
 
     void closeIt() throws E1, E2, E3, E4;
     
