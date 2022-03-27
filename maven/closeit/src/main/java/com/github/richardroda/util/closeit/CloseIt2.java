@@ -15,11 +15,7 @@ import java.util.function.Predicate;
  */
 @FunctionalInterface
 public interface CloseIt2<E1 extends Exception, 
-        E2 extends Exception> extends AutoCloseable {
-    @Override
-    default void close() throws E1, E2 {
-        closeIt();
-    }
+        E2 extends Exception> extends CloseIt3<E1, E2, RuntimeException> {
 
     void closeIt() throws E1, E2;
     

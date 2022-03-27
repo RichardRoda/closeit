@@ -19,12 +19,7 @@ import java.util.function.Predicate;
  * @author Richard Roda
  */
 @FunctionalInterface
-public interface CloseIt1<E extends Exception> extends AutoCloseable {
-
-    @Override
-    default void close() throws E {
-        closeIt();
-    }
+public interface CloseIt1<E extends Exception> extends CloseIt2<E, RuntimeException> {
 
     void closeIt() throws E;
 
@@ -44,7 +39,7 @@ public interface CloseIt1<E extends Exception> extends AutoCloseable {
      * specified by the {@code CloseIt1} interface.
      * @see com.github.richardroda.util.closeit.CloseIt0#wrapException(java.lang.AutoCloseable)
      */
-    public static <E extends Exception> CloseIt1<E> wrapException(AutoCloseable autoCloseable,
+    static <E extends Exception> CloseIt1<E> wrapException(AutoCloseable autoCloseable,
             Function<? super Exception, ? extends E> exceptionMapper) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
@@ -78,7 +73,7 @@ public interface CloseIt1<E extends Exception> extends AutoCloseable {
      * specified by the {@code CloseIt1} interface.
      * @see com.github.richardroda.util.closeit.CloseIt0#wrapAllException(java.lang.AutoCloseable)
      */
-    public static <E extends Exception> CloseIt1<E> wrapAllException(AutoCloseable autoCloseable,
+    static <E extends Exception> CloseIt1<E> wrapAllException(AutoCloseable autoCloseable,
             Function<? super Exception, ? extends E> exceptionMapper) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
@@ -110,7 +105,7 @@ public interface CloseIt1<E extends Exception> extends AutoCloseable {
      * specified by the {@code CloseIt1} interface.
      * @see com.github.richardroda.util.closeit.CloseIt0#wrapAllThrowable(java.lang.AutoCloseable)
      */
-    public static <E extends Exception> CloseIt1<E> wrapAllThrowable(AutoCloseable autoCloseable,
+    static <E extends Exception> CloseIt1<E> wrapAllThrowable(AutoCloseable autoCloseable,
             Function<? super Throwable, ? extends E> exceptionMapper) {
         Objects.requireNonNull(autoCloseable, "autoCloseable required");
         Objects.requireNonNull(exceptionMapper, "exceptionMapper required");
