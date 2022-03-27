@@ -20,7 +20,7 @@ package com.github.richardroda.util.closeit;
 public final class NotClosedException extends IllegalStateException {
 
     /**
-     * Package priave constructor guarantees this class is only created
+     * Package private constructor guarantees this class is only created
      * by the {@link CloseIt0} class.
      * @param cause The Exception or Throwable that occurred in the close method.
      */

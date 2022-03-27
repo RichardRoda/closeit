@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 public interface CloseIt2<E1 extends Exception, 
         E2 extends Exception> extends CloseIt3<E1, E2, RuntimeException> {
 
+    @Override
     void closeIt() throws E1, E2;
     
     /**
