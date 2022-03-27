@@ -21,6 +21,7 @@ import java.util.function.Predicate;
 @FunctionalInterface
 public interface CloseIt1<E extends Exception> extends CloseIt2<E, RuntimeException> {
 
+    @Override
     void closeIt() throws E;
 
     /**

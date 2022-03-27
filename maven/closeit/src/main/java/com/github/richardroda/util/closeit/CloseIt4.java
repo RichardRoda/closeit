@@ -21,6 +21,7 @@ public interface CloseIt4<E1 extends Exception,
         E3 extends Exception, 
         E4 extends Exception> extends CloseIt5<E1, E2, E3, E4, RuntimeException> {
 
+    @Override
     void closeIt() throws E1, E2, E3, E4;
     
     /**
