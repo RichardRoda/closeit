@@ -6,12 +6,12 @@ This project is available from Maven Central Repository.  To use it, add the fol
 <dependency>
     <groupId>com.github.richardroda.util</groupId>
     <artifactId>closeit</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
 </dependency>
 ```
 Use this dependency for Gradle
 
-	compile "com.github.richardroda.util:closeit:1.6"
+	compile "com.github.richardroda.util:closeit:1.7"
 
 This project provides module info to support Java 9+ modules and is binary compatible with Java 8.  Java 9+ projects using this as a module should put `requires com.github.richardroda.util.closeit;` in their module declaration to enable usage of this library.
 
