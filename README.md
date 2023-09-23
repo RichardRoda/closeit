@@ -13,6 +13,8 @@ Use this dependency for Gradle
 
 	compile "com.github.richardroda.util:closeit:1.7"
 
+Note: there is a newer version 1.7.1.  This has exactly the same code as 1.7 but compiled and tested with the OpenJDK 21 compiler.  Either version may be used with the same results.
+
 This project provides module info to support Java 9+ modules and is binary compatible with Java 8.  Java 9+ projects using this as a module should put `requires com.github.richardroda.util.closeit;` in their module declaration to enable usage of this library.
 
 Java 7 introduced a useful feature known as the `try-with-resources` construct. In order to take advantage of it, a class must implement `AutoCloseable`. However, there are classes that could benefit from this interface that do not implement it. Two examples are `Context` and `ExecutorService`. Although `AutoCloseable` is a functional interface because it implements exactly 1 abstract method, it is often not what is needed as a lambda target because `AutoCloseable::close` throws `Exception`. 

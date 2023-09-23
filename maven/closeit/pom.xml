@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.richardroda.util</groupId>
     <artifactId>closeit</artifactId>
-    <version>1.7</version>
+    <version>1.7.1</version>
     <packaging>jar</packaging>
     <description>
         Functional interfaces that facilitate using try-with-resources with
@@ -35,7 +35,7 @@
         <connection>scm:git:https://github.com/RichardRoda/closeit.git</connection>
         <developerConnection>scm:git:https://github.com/RichardRoda/closeit.git</developerConnection>
         <url>https://github.com/RichardRoda/closeit.git/tree/master</url>
-      <tag>closeit-1.7</tag>
+      <tag>closeit-1.7.1</tag>
   </scm>
     <issueManagement>
         <system>GitHub</system>
@@ -138,7 +138,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
