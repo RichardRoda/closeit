@@ -239,7 +239,7 @@ try (CloseIt1<NamingException> it = CloseIt1.rethrow(ctx::close,
 
 **Example 12: Process and Conditionally Throw Close Exceptions**
 
-This example shows how to process a close exception with a `Predicate`, and then have it conditionally re-thrown when the predicate returns `true`.  Unlike the previous examples, this is available on all of the CloseIt interfaces (`CloseIt0` - `CloseIt5`).  In this example, after logging, the exception is rethrown if it is a `CommunicationException` or a `ServiceUnavailableException`.
+This example shows how to process a close exception with a `Predicate`, and then have it conditionally re-thrown when the predicate returns `true`.  This is available on all of the CloseIt interfaces (`CloseIt0` - `CloseIt5`).  In this example, after logging, the exception is rethrown if it is a `CommunicationException` or a `ServiceUnavailableException`.
 
 ```java
 import com.github.richardroda.util.closeit.*;
@@ -259,7 +259,7 @@ import com.github.richardroda.util.closeit.*;
 
 The `CloseIt1.rethrow` and `CloseIt1.rethrowWhen` methods can be combined with the following `CloseIt0` methods that deal with checked exceptions: `wrapException`, `wrapAllException`, `wrapAllThrowable`, and `hideException`.  A two layered decorator may be produced that combines the functionality of both.  To wrap the `CommunicationException` and `ServiceUnavailableException` checked exceptions that occur in Example 12, the code could be written like this:
 ```java
-    public void rethrowExceptionWhen(Context ctx) {
+    public void rethrowExceptionWhenAndWrap(Context ctx) {
         try (CloseIt0 it = CloseIt0.wrapException(CloseIt1.rethrowWhen(ctx::close,
                 ex->{
                     logger.warning("Error closing context " + ex);
@@ -273,7 +273,7 @@ The `CloseIt1.rethrow` and `CloseIt1.rethrowWhen` methods can be combined with t
 
 To perform the `rethrow` processing in example 11 and hide the exception from the compiler, the code could be written like this
 ```java
-    public void rethrowException(Context ctx)  {
+    public void rethrowExceptionAndHide(Context ctx)  {
         try (CloseIt0 it = CloseIt0.hideException(CloseIt1.rethrow(ctx::close,
                 ex->logger.warning("Error closing context " + ex)))) {
             doSomethingWithContext(ctx); // Throws no checked exceptions.
@@ -283,7 +283,7 @@ To perform the `rethrow` processing in example 11 and hide the exception from th
 
 When combining `CloseIt1` rethrow methods with `CloseIt0` checked exception processing, `CloseIt1` should work with any closable expression regardless of how many and what kinds of checked exceptions are thrown.  If an exception related error occurs, the `CloseIt1` method may be called explicitly with `Exception` as the parameter type to resolve it.  This example also shows how to combine the error handling of `CloseIt1.rethrow` or `CloseIt1.rethrowWhen` methods with catching the `NotClosedException` provided by `CloseIt0.wrapException`, `CloseIt0.wrapAllException`, or `CloseIt0.wrapAllThrowable`.
 ```java
-public void rethrowException(Context ctx) {
+public void rethrowExceptionAndCatch(Context ctx) {
     // Force the compiler to use CloseIt1<Exception> for the rethrow call.
     // This resolves errors caused by checked exception ambiguity.
     try(CloseIt0 it=CloseIt0.wrapAllException(CloseIt1.<Exception>rethrow(ctx::close,
